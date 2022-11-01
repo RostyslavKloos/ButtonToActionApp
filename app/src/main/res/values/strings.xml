@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ButtonToActionApp</string>
+    <string name="action">Action</string>
+    <string name="avatar">avatar</string>
+</resources>
