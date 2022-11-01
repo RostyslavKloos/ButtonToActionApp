@@ -9,6 +9,7 @@ class ActionRepositoryImpl @Inject constructor(
     private val service: ActionService,
 ) : ActionRepository {
     override suspend fun fetchActions(): List<ActionDomain> {
+        // TODO add try catch with and throw Domain exception
         val data = service.fetchActions()
         return data.map { it.toDomain() }
     }

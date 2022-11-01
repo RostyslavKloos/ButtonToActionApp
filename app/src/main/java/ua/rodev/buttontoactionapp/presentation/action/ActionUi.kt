@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.view.animation.Animation.RELATIVE_TO_SELF
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
@@ -66,14 +65,12 @@ sealed class ActionUi {
         override fun action() {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
-
     }
 
     class Call : ActionUi() {
         override fun action() {
-            Log.e("RORO", "CALL ACTION")
+            // TODO obtain action
         }
-
     }
 
     class Notification(
