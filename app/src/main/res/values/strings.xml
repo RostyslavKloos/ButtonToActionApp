@@ -2,4 +2,11 @@
     <string name="app_name">ButtonToActionApp</string>
     <string name="action">Action</string>
     <string name="avatar">avatar</string>
+    <string name="no_connection_message">No internet connection</string>
+    <string name="service_is_unavailable">Service is unavailable</string>
+    <string name="no_available_actions">No available actions</string>
+    <string name="menu_contacts_screen_item">Contacts Screen</string>
+    <string name="menu_contacts_intent_item">Contacts Intent</string>
+    <string name="menu_compose_item">Compose</string>
+    <string name="error_action_on_cool_down">%1$s action on coolDown</string>
 </resources>

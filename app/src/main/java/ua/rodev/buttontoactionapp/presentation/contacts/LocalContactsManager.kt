@@ -26,15 +26,13 @@ class LocalContactsManagerImpl(private val context: Context) : LocalContactsMana
             val idIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
             val nameIndex =
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             val photoIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getString(idIndex)
                 val name = cursor.getString(nameIndex)
-                val number = cursor.getString(numberIndex)
                 val avatarUri = cursor.getStringOrNull(photoIndex)
-                addNewContactOrChangeExisting(id, name, number, avatarUri, contacts)
+                addNewContactOrChangeExisting(id, name, avatarUri, contacts)
             }
         }
         cursor?.close()
@@ -44,21 +42,21 @@ class LocalContactsManagerImpl(private val context: Context) : LocalContactsMana
     private fun addNewContactOrChangeExisting(
         id: String,
         name: String,
-        number: String,
         avatarUri: String?,
         contacts: ArrayList<ContactUi>,
     ) {
-        val existingContact = contacts.firstOrNull { it.id == id.toLong() }
+        val contactId = id.toLong()
+        val existingContact = contacts.firstOrNull { it.compare(contactId) }
         if (existingContact == null) {
             val contact = ContactUi(
-                id = id.toLong(),
+                id = contactId,
                 name = name,
                 avatarUri = avatarUri,
             )
             contacts.add(contact)
         } else {
             contacts.remove(existingContact)
-            contacts.add(ContactUi(id.toLong(), name, avatarUri))
+            contacts.add(ContactUi(contactId, name, avatarUri))
         }
     }
 }

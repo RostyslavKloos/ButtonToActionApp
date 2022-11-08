@@ -10,8 +10,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ua.rodev.buttontoactionapp.BuildConfig
 import ua.rodev.buttontoactionapp.core.DispatchersList
-import ua.rodev.buttontoactionapp.data.ActionRepositoryImpl
-import ua.rodev.buttontoactionapp.data.remote.ActionService
+import ua.rodev.buttontoactionapp.data.MainActionRepository
+import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
+import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
+import ua.rodev.buttontoactionapp.data.cloud.ActionService
+import ua.rodev.buttontoactionapp.data.cloud.CloudDataSource
+import ua.rodev.buttontoactionapp.domain.ActionDomain
 import ua.rodev.buttontoactionapp.domain.ActionRepository
 import javax.inject.Singleton
 
@@ -49,6 +53,9 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideActionRepository(service: ActionService): ActionRepository =
-        ActionRepositoryImpl(service)
+    fun provideActionRepository(
+        cloudDataSource: CloudDataSource,
+        cacheDataSource: CacheDataSource,
+        mapper: ActionCloud.Mapper<ActionDomain>,
+    ): ActionRepository = MainActionRepository(cloudDataSource, cacheDataSource, mapper)
 }

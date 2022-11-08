@@ -37,9 +37,9 @@ class ContactsAdapter(private val clickListener: ClickListener) :
 class NumberViewHolder(view: View, private val clickListener: ClickListener) :
     RecyclerView.ViewHolder(view) {
 
-    private val title = itemView.findViewById<TextView>(R.id.tvName)
-    private val subTitle = itemView.findViewById<ImageView>(R.id.ivAvatar)
-    private val mapper = ContactUiMapper(title, subTitle)
+    private val name = itemView.findViewById<TextView>(R.id.tvName)
+    private val avatar = itemView.findViewById<ImageView>(R.id.ivAvatar)
+    private val mapper = ContactUiMapper(name, avatar)
 
     fun bind(model: ContactUi) {
         model.map(mapper)
@@ -64,5 +64,5 @@ class DiffUtilCallback(
         oldList[oldItemPosition].map(newList[newItemPosition])
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        oldList[oldItemPosition].equals(newList[newItemPosition])
+        oldList[oldItemPosition] == newList[newItemPosition]
 }

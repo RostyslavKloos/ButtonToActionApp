@@ -4,14 +4,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ua.rodev.buttontoactionapp.presentation.action.ActionDomainToUiMapper
-import javax.inject.Singleton
+import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
+import ua.rodev.buttontoactionapp.data.cloud.ActionCloudToDomainMapper
+import ua.rodev.buttontoactionapp.domain.ActionDomain
 
 @InstallIn(SingletonComponent::class)
 @Module
 object MapperModule {
 
-    @Singleton
     @Provides
-    fun provideActionDomainToUiMapper(): ActionDomainToUiMapper = ActionDomainToUiMapper()
+    fun provideActionCloudToDomainMapper(): ActionCloud.Mapper<ActionDomain> =
+        ActionCloudToDomainMapper()
 }
