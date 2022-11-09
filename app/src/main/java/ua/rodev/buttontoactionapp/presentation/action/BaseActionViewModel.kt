@@ -2,7 +2,6 @@ package ua.rodev.buttontoactionapp.presentation.action
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -59,34 +58,4 @@ abstract class BaseActionViewModel(
            }
        }
     }
-}
-
-class ScoreViewModelFactory(private val test: Boolean) : ViewModelProvider.Factory {
-
-    @Inject
-    lateinit var dispatchersList: DispatchersList
-    @Inject
-    lateinit var interactor: ActionInteractor
-    @Inject
-    lateinit var actionFlow: Communication.Mutable<ActionType>
-    @Inject
-    lateinit var mapper: ActionsResult.ActionResultMapper<Unit>
-    @Inject
-    lateinit var navigationFlow: Communication.Update<NavigationStrategy>
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (test) {
-            BaseActionViewModel.MainActionViewModel(
-                dispatchersList, interactor, actionFlow, mapper
-            ) as T
-        } else {
-            BaseActionViewModel.ActionWithNavigationViewModel(
-                dispatchersList, interactor, actionFlow, mapper, navigationFlow
-            ) as T
-        }
-    }
-
-//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//        return super.create(modelClass)
-//    }
 }
