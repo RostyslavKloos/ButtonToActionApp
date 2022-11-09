@@ -5,34 +5,35 @@ import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import ua.rodev.buttontoactionapp.ActionType
-import ua.rodev.buttontoactionapp.ActionUi
 import ua.rodev.buttontoactionapp.R
+import ua.rodev.buttontoactionapp.domain.ActionType
+import ua.rodev.buttontoactionapp.presentation.action.di.ActionViewModel
+import ua.rodev.buttontoactionapp.presentation.main.MyLifecycleObserver
 
 @AndroidEntryPoint
 class ActionFragment : Fragment(R.layout.fragment_action) {
 
-    private val viewModel: ActionViewModel by viewModels()
+    @ActionViewModel
+    private val viewModel: BaseActionViewModel.MainActionViewModel by viewModels()
+    lateinit var observer: MyLifecycleObserver
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val button = view.findViewById<Button>(R.id.btnAction)
+        val context = requireContext()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val context = requireContext()
-            // TODO rewrite logic. collect ActionUi instead
-            viewModel.action.collect {
-                when (it) {
-                    ActionType.Animation -> ActionUi.Animation(button).action()
-                    ActionType.Toast -> ActionUi.ToastMessage(context).action()
-                    ActionType.Call -> ActionUi.Call().action()
-                    ActionType.Notification -> ActionUi.Notification(context).action()
-                    ActionType.None -> {}
-                }
+        observer = MyLifecycleObserver(requireActivity())
+        lifecycle.addObserver(observer)
+
+        viewModel.collect(viewLifecycleOwner) {
+            when (it) {
+                ActionType.Animation -> AnimationAction(button).perform()
+                ActionType.Toast -> ToastAction(context).perform()
+                ActionType.Call -> CallAction(observer.resultLauncher).perform()
+                ActionType.Notification -> NotificationAction(context).perform()
+                ActionType.None -> {}
             }
         }
 

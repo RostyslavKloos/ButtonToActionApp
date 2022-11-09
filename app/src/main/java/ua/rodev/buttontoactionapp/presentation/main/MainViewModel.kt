@@ -1,31 +1,28 @@
 package ua.rodev.buttontoactionapp.presentation.main
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
+import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Screen
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
-
-    // TODO remove val and use navigation via constructor
-    private val _navigation = MutableSharedFlow<NavigationStrategy>()
-    val navigation = _navigation.asSharedFlow()
+class MainViewModel @Inject constructor(
+    private val communicationFlow: Communication.Mutable<NavigationStrategy>
+) : ViewModel(), Communication.Observe<NavigationStrategy>{
 
     fun init() {
         viewModelScope.launch {
-            _navigation.emit(NavigationStrategy.Replace(Screen.Action))
+            communicationFlow.map(NavigationStrategy.Replace(Screen.Action))
         }
     }
 
-    fun navigate(screen: Screen) {
-        viewModelScope.launch {
-            _navigation.emit(NavigationStrategy.Add(screen))
-        }
+    override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) {
+        communicationFlow.collect(owner, collector)
     }
 }

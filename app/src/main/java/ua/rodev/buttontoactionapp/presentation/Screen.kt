@@ -15,5 +15,4 @@ sealed class Screen {
     object Contacts : Screen() {
         override fun fragment(): Class<out Fragment> = ContactsFragment::class.java
     }
-
 }

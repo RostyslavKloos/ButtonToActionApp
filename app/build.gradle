@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -37,6 +38,14 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    compileOptions.coreLibraryDesugaringEnabled true
 }
 
 dependencies {
@@ -46,7 +55,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // viewModel
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.8")
+
+    // ViewModel
     implementation "androidx.fragment:fragment-ktx:1.5.4"
     def lifecycle_version = "2.5.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
@@ -63,6 +74,13 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-fragment:1.0.0") {
         exclude group: 'androidx.navigation'
     }
+
+    // DataStore
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

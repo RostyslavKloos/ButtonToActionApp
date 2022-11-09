@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/contacts_intent"
+        android:title="@string/menu_contacts_intent_item" />
+    <item
+        android:id="@+id/contacts_screen"
+        android:title="@string/menu_contacts_screen_item" />
+    <item
+        android:id="@+id/compose"
+        android:title="@string/menu_compose_item" />
+</menu>
