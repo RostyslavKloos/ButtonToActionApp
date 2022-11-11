@@ -43,8 +43,7 @@ interface PreferenceDataStore<T> {
         }
     }
 
-    class ActionScreenTypeConfiguration(context: Context) : Abstract<Boolean>(context) {
-
+    class SettingsPreferences(context: Context) : Abstract<Boolean>(context) {
         override fun save(key: String, data: Boolean) {
             preferences.edit().putBoolean(key, data).apply()
         }

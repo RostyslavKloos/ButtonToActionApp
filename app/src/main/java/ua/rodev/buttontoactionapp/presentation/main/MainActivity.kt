@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.actions -> viewModel.navigate(Screen.Action)
-                R.id.settings -> viewModel.navigate(Screen.Contacts)
+                R.id.actions -> viewModel.replace(Screen.Action)
+                R.id.settings -> viewModel.replace(Screen.Settings)
             }
             true
         }

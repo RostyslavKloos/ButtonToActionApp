@@ -28,7 +28,6 @@ object ActionModule {
     @Qualifier
     annotation class IntentTypeMapper
 
-
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
     annotation class ActionViewModel

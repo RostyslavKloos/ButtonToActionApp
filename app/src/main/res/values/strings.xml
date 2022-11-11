@@ -8,4 +8,6 @@
     <string name="error_action_on_cool_down">%1$s action on coolDown</string>
     <string name="contacts_permission_denied">Contacts permission denied</string>
     <string name="notification_permission_denied">Notification permission denied</string>
+    <string name="use_compose">Use compose</string>
+    <string name="use_contacts_screen">Use contacts screen</string>
 </resources>

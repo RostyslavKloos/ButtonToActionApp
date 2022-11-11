@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import ua.rodev.buttontoactionapp.data.cache.ActionScreenTypeConfiguration
 import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Screen
@@ -15,7 +14,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val communicationFlow: Communication.Mutable<NavigationStrategy>,
-    private val actionViewModelConfiguration: ActionScreenTypeConfiguration.Mutable,
 ) : ViewModel(), Communication.Observe<NavigationStrategy> {
 
     fun init() {
@@ -24,7 +22,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun navigate(screen: Screen) {
+    fun replace(screen: Screen) {
         viewModelScope.launch {
             communicationFlow.map(NavigationStrategy.Replace(screen))
         }
@@ -32,9 +30,5 @@ class MainViewModel @Inject constructor(
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) {
         communicationFlow.collect(owner, collector)
-    }
-
-    fun save(data: Boolean) {
-        actionViewModelConfiguration.save(data)
     }
 }

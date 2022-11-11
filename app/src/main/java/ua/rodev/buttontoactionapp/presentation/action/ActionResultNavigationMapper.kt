@@ -15,7 +15,7 @@ class ActionResultNavigationMapper(
     override suspend fun map(type: ActionType, errorMessage: String) {
         if (errorMessage.isEmpty()) {
             if (type == ActionType.Call) {
-                navigationFlow.map(NavigationStrategy.Replace(Screen.Contacts))
+                navigationFlow.map(NavigationStrategy.Add(Screen.Contacts))
             } else {
                 actionFlow.map(type)
                 log.print("ACTION $type")

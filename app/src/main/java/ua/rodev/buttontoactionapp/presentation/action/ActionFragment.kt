@@ -3,6 +3,7 @@ package ua.rodev.buttontoactionapp.presentation.action
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -12,9 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.core.Read
-import ua.rodev.buttontoactionapp.data.di.CacheModule
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.main.MyLifecycleObserver
+import ua.rodev.buttontoactionapp.presentation.settings.di.SettingsModule
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,14 +25,14 @@ class ActionFragment : Fragment(R.layout.fragment_action) {
     lateinit var dependencyContainer: DependencyContainer
 
     @Inject
-    @CacheModule.ActionScreenTypeConfigurationReadQualifier
-    lateinit var actionScreenTypeConfiguration: Read<Boolean>
+    @SettingsModule.UseContactsScreenPreferences
+    lateinit var useContactsPreferences: Read<Boolean>
     lateinit var viewModel: BaseActionViewModel
     lateinit var observer: MyLifecycleObserver
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val actionBoolean = actionScreenTypeConfiguration.read()
+        val actionBoolean = useContactsPreferences.read()
         viewModel = ViewModelProvider(
             this@ActionFragment,
             ViewModelsFactory(dependencyContainer, actionBoolean)

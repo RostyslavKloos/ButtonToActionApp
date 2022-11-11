@@ -28,7 +28,7 @@ abstract class BaseActionViewModel(
     fun performAction() {
         viewModelScope.launch(dispatchersList.io()) {
             val action = interactor.action()
-            action.map(mapper)
+            ActionsResult.Success(ActionType.Call).map(mapper)
         }
     }
 
