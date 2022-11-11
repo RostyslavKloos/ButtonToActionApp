@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.di
+package ua.rodev.buttontoactionapp.core.di
 
 import android.content.Context
 import dagger.Module

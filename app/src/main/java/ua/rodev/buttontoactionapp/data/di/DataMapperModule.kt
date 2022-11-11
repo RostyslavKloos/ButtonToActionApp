@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.di
+package ua.rodev.buttontoactionapp.data.di
 
 import dagger.Module
 import dagger.Provides
@@ -10,7 +10,7 @@ import ua.rodev.buttontoactionapp.domain.ActionDomain
 
 @InstallIn(SingletonComponent::class)
 @Module
-object MapperModule {
+object DataMapperModule {
 
     @Provides
     fun provideActionCloudToDomainMapper(): ActionCloud.Mapper<ActionDomain> =

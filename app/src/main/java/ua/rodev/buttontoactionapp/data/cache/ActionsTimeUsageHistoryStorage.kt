@@ -1,21 +1,16 @@
 package ua.rodev.buttontoactionapp.data.cache
 
+import ua.rodev.buttontoactionapp.core.Read
+import ua.rodev.buttontoactionapp.core.Save
+
 interface ActionsTimeUsageHistoryStorage {
 
-    interface Save {
-        suspend fun save(data: HashMap<String, Long>)
-    }
+    interface Mutable : Save<HashMap<String, Long>>, Read<HashMap<String, Long>>
 
-    interface Read {
-        suspend fun read(): HashMap<String, Long>
-    }
+    class Main(private val preferences: PreferenceDataStore<HashMap<String, Long>>) : Mutable {
 
-    interface Mutable : Save, Read
-
-    class Main(private val preferences: PreferenceDataStore) : Mutable {
-
-        override suspend fun save(data: HashMap<String, Long>) = preferences.save(KEY, data)
-        override suspend fun read() = preferences.read(KEY)
+        override fun save(data: HashMap<String, Long>) = preferences.save(KEY, data)
+        override fun read() = preferences.read(KEY)
 
         companion object {
             private const val KEY = "ActionsCoolDownKey"

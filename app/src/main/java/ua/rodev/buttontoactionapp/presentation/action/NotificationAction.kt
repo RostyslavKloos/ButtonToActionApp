@@ -27,20 +27,21 @@ class NotificationAction(
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-
-//            val resultIntent = Intent(Intent.ACTION_PICK).apply {
-//                type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
-//            }
-
         val resultIntent = Intent(context, MainActivity::class.java).apply {
             action = SHOW_CONTACTS_ACTION
+        }
+
+        val pendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE
+        } else {
+            0
         }
 
         val pendingIntent = PendingIntent.getActivity(
             context,
             System.currentTimeMillis().toInt(),
             resultIntent,
-            0
+            pendingIntentFlag
         )
 
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)

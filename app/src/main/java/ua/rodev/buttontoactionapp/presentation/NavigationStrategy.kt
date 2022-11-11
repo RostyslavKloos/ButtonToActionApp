@@ -18,9 +18,7 @@ interface NavigationStrategy {
                 .commit()
         }
 
-        protected abstract fun FragmentTransaction.executeTransaction(
-            containerId: Int,
-        ): FragmentTransaction
+        protected abstract fun FragmentTransaction.executeTransaction(containerId: Int): FragmentTransaction
     }
 
     data class Replace(override val screen: Screen) : Abstract(screen) {

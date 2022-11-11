@@ -16,6 +16,10 @@ import javax.inject.Singleton
 @Module
 object CloudModule {
 
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    annotation class MockRepo
+
     @Provides
     @Singleton
     fun provideCloudDataSource(
@@ -26,10 +30,6 @@ object CloudModule {
     @Singleton
     @MockRepo
     fun provideTestCaheRepo(
-        mapper: ActionCloud.Mapper<ActionDomain>
+        mapper: ActionCloud.Mapper<ActionDomain>,
     ): ActionRepository = ActionRepository.Test(mapper)
 }
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class MockRepo

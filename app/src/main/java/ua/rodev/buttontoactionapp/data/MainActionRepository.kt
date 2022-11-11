@@ -11,7 +11,7 @@ class MainActionRepository(
     private val cloudDataSource: CloudDataSource,
     private val cacheDataSource: CacheDataSource,
     private val mapper: ActionCloud.Mapper<ActionDomain>,
-): ActionRepository {
+) : ActionRepository {
 
     @Throws(DomainException::class)
     override suspend fun fetchActions(): List<ActionDomain> {

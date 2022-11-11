@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.di
+package ua.rodev.buttontoactionapp.presentation.main.di
 
 import dagger.Module
 import dagger.Provides

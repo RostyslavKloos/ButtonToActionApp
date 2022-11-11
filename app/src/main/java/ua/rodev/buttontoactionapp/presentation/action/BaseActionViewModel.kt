@@ -4,7 +4,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.core.DispatchersList
@@ -12,15 +11,14 @@ import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.domain.ActionsResult
 import ua.rodev.buttontoactionapp.presentation.Communication
-import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
-import ua.rodev.buttontoactionapp.presentation.Screen
+import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 import javax.inject.Inject
 
 abstract class BaseActionViewModel(
     private val dispatchersList: DispatchersList,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
-    private val mapper: ActionsResult.ActionResultMapper<Unit>
+    private val mapper: ActionsResult.ActionResultMapper<Unit>,
 ) : ViewModel(), Communication.Observe<ActionType> {
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
@@ -39,7 +37,7 @@ abstract class BaseActionViewModel(
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        mapper: ActionsResult.ActionResultMapper<Unit>
+        @ActionModule.IntentTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
     ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, mapper)
 
     @HiltViewModel
@@ -47,15 +45,6 @@ abstract class BaseActionViewModel(
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        mapper: ActionsResult.ActionResultMapper<Unit>,
-        private val navigationFlow: Communication.Update<NavigationStrategy>,
-    ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, mapper) {
-
-       init {
-           viewModelScope.launch {
-               delay(3000)
-               navigationFlow.map(NavigationStrategy.Add(Screen.Contacts))
-           }
-       }
-    }
+        @ActionModule.ContactTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
+    ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, mapper)
 }

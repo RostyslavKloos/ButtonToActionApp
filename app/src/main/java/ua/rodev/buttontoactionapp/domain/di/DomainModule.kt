@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.di
+package ua.rodev.buttontoactionapp.domain.di
 
 import dagger.Module
 import dagger.Provides
@@ -23,12 +23,20 @@ import javax.inject.Singleton
 @Module
 object DomainModule {
 
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    annotation class MockInteractor
+
     @Provides
     fun provideFindCoolDown(
         usageHistory: ActionsTimeUsageHistoryStorage.Mutable,
         handleError: HandleError<String>,
     ): FindActionWithoutCoolDown =
-        FindActionWithoutCoolDown.Main(ActionDomainToActionResultMapper(), usageHistory, handleError)
+        FindActionWithoutCoolDown.Main(
+            ActionDomainToActionResultMapper(),
+            usageHistory,
+            handleError
+        )
 
     @Singleton
     @Provides
@@ -44,7 +52,6 @@ object DomainModule {
         CheckValidDays.Main(),
         findCoolDown
     )
-
 
     @Singleton
     @Provides
@@ -66,7 +73,3 @@ object DomainModule {
         )
     }
 }
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class MockInteractor

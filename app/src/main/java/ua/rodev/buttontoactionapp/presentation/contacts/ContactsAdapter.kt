@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.core.Mapper
 
-class ContactsAdapter(private val clickListener: ClickListener) :
-    RecyclerView.Adapter<NumberViewHolder>(), Mapper.Unit<List<ContactUi>> {
+class ContactsAdapter(
+    private val clickListener: ClickListener,
+) : RecyclerView.Adapter<NumberViewHolder>(), Mapper.Unit<List<ContactUi>> {
 
     private val list = mutableListOf<ContactUi>()
 
@@ -34,8 +35,10 @@ class ContactsAdapter(private val clickListener: ClickListener) :
     }
 }
 
-class NumberViewHolder(view: View, private val clickListener: ClickListener) :
-    RecyclerView.ViewHolder(view) {
+class NumberViewHolder(
+    view: View,
+    private val clickListener: ClickListener,
+) : RecyclerView.ViewHolder(view) {
 
     private val name = itemView.findViewById<TextView>(R.id.tvName)
     private val avatar = itemView.findViewById<ImageView>(R.id.ivAvatar)
