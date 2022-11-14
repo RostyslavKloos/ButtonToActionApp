@@ -2,9 +2,10 @@ package ua.rodev.buttontoactionapp.data.cache
 
 import android.content.Context
 import com.google.gson.Gson
+import okio.IOException
 import ua.rodev.buttontoactionapp.data.FetchActions
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
-import ua.rodev.buttontoactionapp.data.cloud.MockActions
+import ua.rodev.buttontoactionapp.data.cloud.CloudActionsList
 import java.io.*
 
 interface CacheDataSource : FetchActions {
@@ -32,13 +33,14 @@ interface CacheDataSource : FetchActions {
             }
         }
 
+        @Throws(IOException::class)
         override suspend fun fetchActions(): List<ActionCloud> {
             val file = File(directory, CHILD)
             val fileReader = FileReader(file)
             val bufferedReader = BufferedReader(fileReader)
             val data = bufferedReader.readLine()
             bufferedReader.close()
-            return gson.fromJson(data, MockActions::class.java)
+            return gson.fromJson(data, CloudActionsList::class.java)
         }
 
         companion object {

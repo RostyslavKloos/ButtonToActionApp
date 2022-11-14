@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.core.DispatchersList
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.domain.ActionsResult
+import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 import javax.inject.Inject
@@ -18,7 +18,7 @@ abstract class BaseActionViewModel(
     private val dispatchersList: DispatchersList,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
-    private val mapper: ActionsResult.ActionResultMapper<Unit>,
+    private val mapper: ActionResult.ActionResultMapper<Unit>,
 ) : ViewModel(), Communication.Observe<ActionType> {
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
@@ -28,7 +28,7 @@ abstract class BaseActionViewModel(
     fun performAction() {
         viewModelScope.launch(dispatchersList.io()) {
             val action = interactor.action()
-            ActionsResult.Success(ActionType.Call).map(mapper)
+            ActionResult.Success(ActionType.Call).map(mapper)
         }
     }
 
@@ -37,7 +37,7 @@ abstract class BaseActionViewModel(
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        @ActionModule.IntentTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
+        @ActionModule.IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, mapper)
 
     @HiltViewModel
@@ -45,6 +45,6 @@ abstract class BaseActionViewModel(
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        @ActionModule.ContactTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
+        @ActionModule.ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, mapper)
 }

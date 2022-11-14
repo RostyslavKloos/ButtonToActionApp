@@ -9,7 +9,7 @@ import ua.rodev.buttontoactionapp.core.Log
 import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.domain.ActionsResult
+import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.action.*
@@ -46,7 +46,7 @@ object ActionModule {
     fun provideActionResultMapper(
         actionFlow: Communication.Mutable<ActionType>,
         log: Log,
-    ): ActionsResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, log)
+    ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, log)
 
     @Provides
     @ContactTypeMapper
@@ -54,7 +54,7 @@ object ActionModule {
         navigationFlow: Communication.Update<NavigationStrategy>,
         actionFlow: Communication.Mutable<ActionType>,
         log: Log,
-    ): ActionsResult.ActionResultMapper<Unit> =
+    ): ActionResult.ActionResultMapper<Unit> =
         ActionResultNavigationMapper(navigationFlow, actionFlow, log)
 
     @Provides
@@ -63,7 +63,7 @@ object ActionModule {
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        mapper: ActionsResult.ActionResultMapper<Unit>,
+        mapper: ActionResult.ActionResultMapper<Unit>,
     ): BaseActionViewModel {
         return BaseActionViewModel.MainActionViewModel(
             dispatchersList, interactor, actionFlow, mapper
@@ -75,7 +75,7 @@ object ActionModule {
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        @ContactTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
+        @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
             dispatchersList, interactor, actionFlow, mapper
@@ -86,7 +86,7 @@ object ActionModule {
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
-        @IntentTypeMapper mapper: ActionsResult.ActionResultMapper<Unit>,
+        @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
         dispatchersList, interactor, actionFlow, mapper
     )

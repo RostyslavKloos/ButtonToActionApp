@@ -1,34 +1,34 @@
 package ua.rodev.buttontoactionapp.data
 
+import org.joda.time.DateTimeUtils
 import ua.rodev.buttontoactionapp.data.cache.ActionsTimeUsageHistoryStorage
 import ua.rodev.buttontoactionapp.domain.ActionDomain
-import ua.rodev.buttontoactionapp.domain.ActionsResult
+import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.HandleError
 
-// TODO: 1.rename. 2.unit tests, 3. refactor 4.remove somewhere
 interface FindActionWithoutCoolDown {
 
-    suspend fun find(priorityAction: ActionDomain): ActionsResult
+    suspend fun action(priorityAction: ActionDomain): ActionResult
 
     class Main(
-        private val mapper: ActionDomain.Mapper<ActionsResult>,
+        private val mapper: ActionDomain.Mapper<ActionResult>,
         private val usageHistory: ActionsTimeUsageHistoryStorage.Mutable,
         private val handleError: HandleError<String>,
     ) : FindActionWithoutCoolDown {
-        override suspend fun find(priorityAction: ActionDomain): ActionsResult {
+        override suspend fun action(priorityAction: ActionDomain): ActionResult {
             val coolDownMap = usageHistory.read()
             val resultActionLastUsageTime = priorityAction.findInMapByType(coolDownMap)
-            val currentTimeMillis = System.currentTimeMillis()
+            val currentTimeMillis = DateTimeUtils.currentTimeMillis()
             return if (resultActionLastUsageTime == null) {
-                priorityAction.updateTimeUsage(coolDownMap, currentTimeMillis)
-                usageHistory.save(coolDownMap)
+                val updated = priorityAction.updateTimeUsage(coolDownMap, currentTimeMillis)
+                usageHistory.save(updated)
                 priorityAction.map(mapper)
             } else {
                 if (priorityAction.onCoolDown(currentTimeMillis, resultActionLastUsageTime)) {
-                    ActionsResult.Failure(handleError.handle(priorityAction.mapToDomainException()))
+                    ActionResult.Failure(handleError.handle(priorityAction.mapToDomainException()))
                 } else {
-                    priorityAction.updateTimeUsage(coolDownMap, currentTimeMillis)
-                    usageHistory.save(coolDownMap)
+                    val updated = priorityAction.updateTimeUsage(coolDownMap, currentTimeMillis)
+                    usageHistory.save(updated)
                     priorityAction.map(mapper)
                 }
             }

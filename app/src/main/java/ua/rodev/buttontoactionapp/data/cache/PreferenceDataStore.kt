@@ -24,19 +24,19 @@ interface PreferenceDataStore<T> {
     class ActionsTimeHistoryUsageStore(
         private val gson: Gson = Gson(),
         context: Context,
-    ) : Abstract<HashMap<String, Long>>(context) {
+    ) : Abstract<Map<String, Long>>(context) {
 
-        override fun save(key: String, data: HashMap<String, Long>) {
+        override fun save(key: String, data: Map<String, Long>) {
             val json = gson.toJson(data)
             preferences.edit().putString(key, json).apply()
         }
 
         @Suppress("UNCHECKED_CAST")
-        override fun read(key: String): HashMap<String, Long> {
+        override fun read(key: String): Map<String, Long> {
             val json = preferences.getString(key, "") ?: ""
-            val hashMap = gson.fromJson(json, HashMap::class.java) as? HashMap<String, Double>
+            val map = gson.fromJson(json, Map::class.java) as? Map<String, Double>
             val mapped = hashMapOf<String, Long>()
-            hashMap?.toMutableMap()?.forEach {
+            map?.toMutableMap()?.forEach {
                 mapped[it.key] = it.value.toLong()
             }
             return mapped
@@ -44,6 +44,7 @@ interface PreferenceDataStore<T> {
     }
 
     class SettingsPreferences(context: Context) : Abstract<Boolean>(context) {
+
         override fun save(key: String, data: Boolean) {
             preferences.edit().putBoolean(key, data).apply()
         }

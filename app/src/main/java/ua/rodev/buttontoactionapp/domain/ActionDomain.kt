@@ -19,14 +19,14 @@ data class ActionDomain(
 
     fun canBeChosen() = enabled
 
-    fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.check(validDays)
+    fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.isValid(validDays)
 
     fun higherPriorityThan(source: ActionDomain): Boolean = this.priority < source.priority
 
     fun findInMapByType(map: Map<String, Long>): Long? = map[type.value]
 
-    fun updateTimeUsage(map: MutableMap<String, Long>, time: Long) {
-        map[type.value] = time
+    fun updateTimeUsage(map: Map<String, Long>, time: Long): Map<String, Long> {
+        return map.toMutableMap().apply { this[type.value] = time }
     }
 
     fun onCoolDown(currentTimeMillis: Long, resultActionLastUsageTime: Long): Boolean {

@@ -17,6 +17,7 @@ import ua.rodev.buttontoactionapp.data.cloud.ActionService
 import ua.rodev.buttontoactionapp.data.cloud.CloudDataSource
 import ua.rodev.buttontoactionapp.domain.ActionDomain
 import ua.rodev.buttontoactionapp.domain.ActionRepository
+import ua.rodev.buttontoactionapp.domain.HandleError
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -57,5 +58,6 @@ object NetworkModule {
         cloudDataSource: CloudDataSource,
         cacheDataSource: CacheDataSource,
         mapper: ActionCloud.Mapper<ActionDomain>,
-    ): ActionRepository = MainActionRepository(cloudDataSource, cacheDataSource, mapper)
+        handleError: HandleError<Exception>
+    ): ActionRepository = MainActionRepository(cloudDataSource, cacheDataSource, mapper, handleError)
 }

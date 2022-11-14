@@ -32,13 +32,13 @@ object CacheModule {
     @ActionsTimeUsageHistoryStorageQualifier
     fun provideActionsTimeHistoryUsageStore(
         @ApplicationContext context: Context,
-    ): PreferenceDataStore<HashMap<String, Long>> {
+    ): PreferenceDataStore<Map<String, Long>> {
         return PreferenceDataStore.ActionsTimeHistoryUsageStore(context = context)
     }
 
     @Provides
     fun provideActionsTimeUsageHistoryStorage(
-        @ActionsTimeUsageHistoryStorageQualifier preferences: PreferenceDataStore<HashMap<String, Long>>,
+        @ActionsTimeUsageHistoryStorageQualifier preferences: PreferenceDataStore<Map<String, Long>>,
     ): ActionsTimeUsageHistoryStorage.Mutable = ActionsTimeUsageHistoryStorage.Main(preferences)
 
 }

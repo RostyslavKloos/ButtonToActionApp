@@ -13,22 +13,22 @@ class MainActionInteractor @Inject constructor(
     private val checkValidDays: CheckValidDays,
     private val findActionWithoutCoolDown: FindActionWithoutCoolDown
 ) : ActionInteractor {
-    // TODO: add unit tests, then refactor 
-    override suspend fun action(): ActionsResult {
+
+    override suspend fun action(): ActionResult {
         try {
             val actions = repository.fetchActions()
             val availableActions = actions.filter {
                 it.canBeChosen() && it.checkValidDays(checkValidDays)
             }
             if (availableActions.isEmpty())
-                return ActionsResult.Failure(manageResources.string(R.string.no_available_actions))
+                return ActionResult.Failure(manageResources.string(R.string.no_available_actions))
             var priorityAction = availableActions.first()
             availableActions.forEach { action ->
                 if (action.higherPriorityThan(priorityAction)) priorityAction = action
             }
-            return findActionWithoutCoolDown.find(priorityAction)
+            return findActionWithoutCoolDown.action(priorityAction)
         } catch (e: DomainException) {
-            return ActionsResult.Failure(handleError.handle(e))
+            return ActionResult.Failure(handleError.handle(e))
         }
     }
 }
