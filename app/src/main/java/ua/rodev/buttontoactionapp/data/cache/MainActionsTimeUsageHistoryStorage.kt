@@ -1,7 +1,7 @@
 package ua.rodev.buttontoactionapp.data.cache
 
 import ua.rodev.buttontoactionapp.domain.ActionsTimeUsageHistoryStorage
-import ua.rodev.buttontoactionapp.domain.PreferenceDataStore
+import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 
 class MainActionsTimeUsageHistoryStorage(
     private val preferences: PreferenceDataStore<Map<String, Long>>,

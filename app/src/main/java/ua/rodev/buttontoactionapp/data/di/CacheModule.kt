@@ -7,11 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ua.rodev.buttontoactionapp.data.cache.ActionsTimeHistoryUsageStore
+import ua.rodev.buttontoactionapp.data.cache.ActionsTimeHistoryPreferences
 import ua.rodev.buttontoactionapp.domain.ActionsTimeUsageHistoryStorage
 import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
 import ua.rodev.buttontoactionapp.data.cache.MainActionsTimeUsageHistoryStorage
-import ua.rodev.buttontoactionapp.domain.PreferenceDataStore
+import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -35,7 +35,7 @@ object CacheModule {
     fun provideActionsTimeHistoryUsageStore(
         @ApplicationContext context: Context,
     ): PreferenceDataStore<Map<String, Long>> {
-        return ActionsTimeHistoryUsageStore(context = context)
+        return ActionsTimeHistoryPreferences(context = context)
     }
 
     @Provides

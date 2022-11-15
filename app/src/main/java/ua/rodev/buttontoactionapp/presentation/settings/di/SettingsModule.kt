@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.Read
 import ua.rodev.buttontoactionapp.core.Save
-import ua.rodev.buttontoactionapp.domain.PreferenceDataStore
+import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
 import ua.rodev.buttontoactionapp.data.cache.SettingsPreferences
 import javax.inject.Qualifier

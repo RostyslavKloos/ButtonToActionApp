@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.domain
+package ua.rodev.buttontoactionapp.core
 
 interface PreferenceDataStore<T> {
 

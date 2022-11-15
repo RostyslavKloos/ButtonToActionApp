@@ -3,7 +3,7 @@ package ua.rodev.buttontoactionapp.data.cache
 import android.content.Context
 import com.google.gson.Gson
 
-class ActionsTimeHistoryUsageStore(
+class ActionsTimeHistoryPreferences(
     private val gson: Gson = Gson(),
     context: Context,
 ) : AbstractPreferenceDataStore<Map<String, Long>>(context) {
