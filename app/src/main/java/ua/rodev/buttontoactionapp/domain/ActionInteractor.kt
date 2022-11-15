@@ -20,20 +20,17 @@ interface ActionInteractor {
         override suspend fun action(currentTimeMills: Long): ActionResult {
             try {
                 val actions = repository.fetchActions()
-                val availableActions = actions.filter {
-                    it.canBeChosen() && it.checkValidDays(checkValidDays)
-                }
+                val coolDownMap = usageHistory.read()
+                val availableActions = actions
+                    .filter { it.canBeChosen() && it.checkValidDays(checkValidDays) }
+                    .filter {
+                        val lastTimeUsage = it.findInMapByType(coolDownMap)
+                        lastTimeUsage == null || !it.onCoolDown(currentTimeMills, lastTimeUsage)
+                    }
                 if (availableActions.isEmpty())
                     return ActionResult.Failure(manageResources.string(R.string.no_available_actions))
-                val coolDownMap = usageHistory.read()
-                val actionsWithoutCoolDown = availableActions.filter {
-                    val lastTimeUsageMills = it.findInMapByType(coolDownMap)
-                    lastTimeUsageMills == null || !it.onCoolDown(currentTimeMills, lastTimeUsageMills)
-                }
-                if (actionsWithoutCoolDown.isEmpty())
-                    return ActionResult.Failure(manageResources.string(R.string.no_available_actions))
-                var priorityAction = actionsWithoutCoolDown.first()
-                actionsWithoutCoolDown.forEach { action ->
+                var priorityAction = availableActions.first()
+                availableActions.forEach { action ->
                     if (action.higherPriorityThan(priorityAction)) priorityAction = action
                 }
                 usageHistory.save(priorityAction.updateTimeUsage(coolDownMap, currentTimeMills))
