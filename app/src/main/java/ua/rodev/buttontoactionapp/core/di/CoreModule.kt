@@ -11,6 +11,7 @@ import ua.rodev.buttontoactionapp.core.ManageResources
 import ua.rodev.buttontoactionapp.data.HandleDomainError
 import ua.rodev.buttontoactionapp.domain.HandleError
 import ua.rodev.buttontoactionapp.domain.ReadRawResource
+import ua.rodev.buttontoactionapp.presentation.HandleUiError
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -31,7 +32,7 @@ object CoreModule {
     @Provides
     fun provideHandleUiError(
         resources: ManageResources,
-    ): HandleError<String> = HandleError.Ui(resources)
+    ): HandleError<String> = HandleUiError(resources)
 
     @Singleton
     @Provides

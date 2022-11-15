@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.data
+package ua.rodev.buttontoactionapp.domain
 
 import com.google.gson.Gson
 import junit.framework.Assert.assertEquals
@@ -9,16 +9,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import ua.rodev.buttontoactionapp.core.ManageResources
-import ua.rodev.buttontoactionapp.data.cache.ActionsTimeUsageHistoryStorage
+import ua.rodev.buttontoactionapp.data.MainCheckValidDays
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloudToDomainMapper
 import ua.rodev.buttontoactionapp.data.cloud.CloudActionsList
-import ua.rodev.buttontoactionapp.domain.*
 import ua.rodev.buttontoactionapp.presentation.ActionDomainToActionResultMapper
+import ua.rodev.buttontoactionapp.presentation.HandleUiError
 import java.io.File
 import java.time.LocalDate
 
-class MainActionInteractorTest {
+class ActionInteractorTest {
 
     private lateinit var interactor: ActionInteractor
     private lateinit var repository: TestRepository
@@ -30,18 +30,20 @@ class MainActionInteractorTest {
     fun setUp() {
         repository = TestRepository(ActionCloudToDomainMapper())
         manageResources = TestManageResources()
-        handleError = HandleError.Ui(manageResources)
+        handleError = HandleUiError(manageResources)
         usageHistory = TestUsageHistory()
-        interactor = MainActionInteractor(
+        interactor = ActionInteractor.Main(
             repository,
             handleError,
             manageResources,
-            CheckValidDays.Main(),
-            FindActionWithoutCoolDown.Main(
-                ActionDomainToActionResultMapper(),
-                usageHistory,
-                handleError
-            )
+            MainCheckValidDays(),
+//            FindActionWithoutCoolDown.Main(
+//                ActionDomainToActionResultMapper(),
+//                usageHistory,
+//                handleError
+//            ),
+            usageHistory,
+            ActionDomainToActionResultMapper()
         )
     }
 
@@ -50,7 +52,7 @@ class MainActionInteractorTest {
     fun `Fetch action no internet connection error`() = runBlocking {
         manageResources.changeExpected("No internet connection")
 
-        val actual = interactor.action()
+        val actual = interactor.action(System.currentTimeMillis())
         val expected = ActionResult.Failure("No internet connection")
 
         assertEquals(actual, expected)
@@ -65,7 +67,7 @@ class MainActionInteractorTest {
         repository.changeExpectedList(notEnabledActions)
         manageResources.changeExpected("No available actions")
 
-        val actual = interactor.action()
+        val actual = interactor.action(System.currentTimeMillis())
         val expected = ActionResult.Failure("No available actions")
 
         assertEquals(actual, expected)
@@ -80,7 +82,7 @@ class MainActionInteractorTest {
             repository.changeExpectedList(notEnabledActions)
             manageResources.changeExpected("No available actions")
 
-            val actual = interactor.action()
+            val actual = interactor.action(System.currentTimeMillis())
             val expected = ActionResult.Failure("No available actions")
 
             assertEquals(actual, expected)
@@ -96,7 +98,7 @@ class MainActionInteractorTest {
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("No available actions")
 
-        val actual = interactor.action()
+        val actual = interactor.action(System.currentTimeMillis())
         val expected = ActionResult.Failure("No available actions")
 
         assertEquals(expected, actual)
@@ -109,10 +111,10 @@ class MainActionInteractorTest {
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("${action.mapToDomainException().action} action on coolDown")
 
-        interactor.action()
+        interactor.action(DateTimeUtils.currentTimeMillis())
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis() + 3_000)
 
-        val actual = interactor.action()
+        val actual = interactor.action(DateTimeUtils.currentTimeMillis())
         val expected = ActionResult.Failure("call action on coolDown")
         assertEquals(expected, actual)
     }
@@ -125,8 +127,8 @@ class MainActionInteractorTest {
         val lowPriorityAction = ActionDomain(ActionType.Animation, true, 1, weekDays, 0)
         repository.changeExpectedList(listOf(highPriorityAction, lowPriorityAction))
 
-        val actual = interactor.action()
-        val expected = ActionResult.Success(ActionType.Animation)
+        val actual = interactor.action(System.currentTimeMillis())
+        val expected = ActionResult.Success(ActionType.Call)
 
         assertEquals(expected, actual)
     }
@@ -146,19 +148,51 @@ class MainActionInteractorTest {
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("${action.mapToDomainException().action} action on coolDown")
 
-        val firstCall = interactor.action()
+        val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
         assertEquals(ActionResult.Success(ActionType.Toast), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
-        val secondCall = interactor.action()
+        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
         assertEquals(ActionResult.Failure("toast action on coolDown"), secondCall)
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
-        val thirdCall = interactor.action()
+        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
         assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
 
         assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
+        assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
+    }
+
+    /**
+     * Fetching several actions with different priority
+     * 1. Fetch first action -> Success -> First action on cooldown.
+     * 2. Fetch second action -> Success -> Second action on cooldown.
+     * 3. Fetching action before both actions cooldown finished -> Error message shown
+     * 4. Fetching action after cooldown finished -> Success
+     */
+    @Test
+    fun `Fetch action success after coolDown period was finished1`() = runBlocking {
+        val currentDay = LocalDate.now().dayOfWeek
+        val action1 = ActionDomain(ActionType.Toast, true, 10, listOf(currentDay.ordinal), 7_200)
+        val action2 = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3000)
+        usageHistory.clear()
+        usageHistory.actionKey = ActionType.Toast.value
+        repository.changeExpectedList(listOf(action1, action2))
+        manageResources.changeExpected("${action1.mapToDomainException().action} action on coolDown")
+
+        val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Toast), firstCall)
+        assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
+
+        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
+        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Call), secondCall)
+        assertEquals(2, usageHistory.read().count())
+
+        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
+        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
 
@@ -216,10 +250,13 @@ class MainActionInteractorTest {
         override fun save(data: Map<String, Long>) {
             coolDownMap.clear()
             coolDownMap.putAll(data)
-            coolDownHistory.add(data[actionKey]!!)
+            data[actionKey]?.let {
+                coolDownHistory.add(it)
+            }
         }
 
         override fun read(): Map<String, Long> {
+            println("map $coolDownMap")
             return coolDownMap
         }
     }

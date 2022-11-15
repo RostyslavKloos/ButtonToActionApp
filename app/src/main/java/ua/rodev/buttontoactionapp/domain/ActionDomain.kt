@@ -1,7 +1,5 @@
 package ua.rodev.buttontoactionapp.domain
 
-import ua.rodev.buttontoactionapp.data.CheckValidDays
-
 // TODO: refactor methods
 data class ActionDomain(
     private val type: ActionType,
@@ -21,7 +19,7 @@ data class ActionDomain(
 
     fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.isValid(validDays)
 
-    fun higherPriorityThan(source: ActionDomain): Boolean = this.priority < source.priority
+    fun higherPriorityThan(source: ActionDomain): Boolean = this.priority > source.priority
 
     fun findInMapByType(map: Map<String, Long>): Long? = map[type.value]
 

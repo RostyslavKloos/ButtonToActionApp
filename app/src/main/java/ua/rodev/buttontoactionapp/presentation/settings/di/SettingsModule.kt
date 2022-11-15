@@ -8,9 +8,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.Read
 import ua.rodev.buttontoactionapp.core.Save
-import ua.rodev.buttontoactionapp.data.cache.PreferenceDataStore
+import ua.rodev.buttontoactionapp.domain.PreferenceDataStore
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
-import ua.rodev.buttontoactionapp.data.di.CacheModule
+import ua.rodev.buttontoactionapp.data.cache.SettingsPreferences
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -38,7 +38,7 @@ object SettingsModule {
     @SettingsPreferences
     fun provideSettingsPreferences(
         @ApplicationContext context: Context,
-    ): PreferenceDataStore<Boolean> = PreferenceDataStore.SettingsPreferences(context)
+    ): PreferenceDataStore<Boolean> = SettingsPreferences(context)
 
     @Provides
     @Singleton
