@@ -8,21 +8,21 @@ import ua.rodev.buttontoactionapp.core.DispatchersList
 import ua.rodev.buttontoactionapp.core.Log
 import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
-import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.domain.ActionResult
+import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.action.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(SingletonComponent::class)
 object ActionModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ContactTypeMapper
+    annotation class ActionProgressFlow
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
@@ -30,11 +30,15 @@ object ActionModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ActionViewModel
+    annotation class ContactTypeMapper
+
+    @Provides
+    fun provideActionFlow(): Communication.Mutable<ActionType> = Communication.ActionTypeFlow()
 
     @Provides
     @Singleton
-    fun provideActionFlow(): Communication.Mutable<ActionType> = Communication.Main()
+    @ActionProgressFlow
+    fun provideProgressFlow(): Communication.Mutable<Boolean> = Communication.ProgressFlow()
 
     @Provides
     fun provideActionNavigation(
@@ -43,14 +47,14 @@ object ActionModule {
 
     @Provides
     @IntentTypeMapper
-    fun provideActionResultMapper(
+    fun provideActionResultIntentTypeMapper(
         actionFlow: Communication.Mutable<ActionType>,
         log: Log,
     ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, log)
 
     @Provides
     @ContactTypeMapper
-    fun provideActionResultMapper1(
+    fun provideActionResultContactTypeMapper(
         navigationFlow: Communication.Update<NavigationStrategy>,
         actionFlow: Communication.Mutable<ActionType>,
         log: Log,
@@ -58,27 +62,15 @@ object ActionModule {
         ActionResultNavigationMapper(navigationFlow, actionFlow, log)
 
     @Provides
-    @ActionViewModel
-    fun provideActionViewModel(
-        dispatchersList: DispatchersList,
-        interactor: ActionInteractor,
-        actionFlow: Communication.Mutable<ActionType>,
-        mapper: ActionResult.ActionResultMapper<Unit>,
-    ): BaseActionViewModel {
-        return BaseActionViewModel.MainActionViewModel(
-            dispatchersList, interactor, actionFlow, mapper
-        )
-    }
-
-    @Provides
     fun provideActionWithNavigationModule(
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
+        @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
-            dispatchersList, interactor, actionFlow, mapper
+            dispatchersList, interactor, actionFlow, progressFlow, mapper
         )
 
     @Provides
@@ -86,9 +78,10 @@ object ActionModule {
         dispatchersList: DispatchersList,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
+        @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
-        dispatchersList, interactor, actionFlow, mapper
+        dispatchersList, interactor, actionFlow,progressFlow, mapper
     )
 
     @Provides

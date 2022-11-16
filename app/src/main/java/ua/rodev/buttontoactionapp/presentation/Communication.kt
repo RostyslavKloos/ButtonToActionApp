@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.core.SuspendMapper
 import ua.rodev.buttontoactionapp.domain.ActionType
@@ -18,29 +19,34 @@ interface Communication {
 
     interface Mutable<T> : Observe<T>, Update<T>
 
-    class Main(
-        private val flow: MutableSharedFlow<ActionType> = MutableSharedFlow(),
-    ) : Mutable<ActionType> {
-
-        override suspend fun map(source: ActionType) = flow.emit(source)
-
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
+    abstract class AbstractSharedFlow<T>(
+        private val flow: MutableSharedFlow<T> = MutableSharedFlow(),
+    ) : Mutable<T> {
+        override fun collect(owner: LifecycleOwner, collector: FlowCollector<T>) {
             owner.lifecycleScope.launch {
                 flow.collect(collector)
             }
         }
+
+        override suspend fun map(source: T) = flow.emit(source)
     }
 
-    class Navigation(
-        private val flow: MutableSharedFlow<NavigationStrategy> = MutableSharedFlow(),
-    ) : Mutable<NavigationStrategy> {
-
-        override suspend fun map(source: NavigationStrategy) = flow.emit(source)
-
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) {
+    abstract class AbstractStateFlow<T>(
+        private val initialValue: T,
+        private val flow: MutableStateFlow<T> = MutableStateFlow(initialValue),
+    ) : Mutable<T> {
+        override fun collect(owner: LifecycleOwner, collector: FlowCollector<T>) {
             owner.lifecycleScope.launch {
                 flow.collect(collector)
             }
         }
+
+        override suspend fun map(source: T) = flow.emit(source)
     }
+
+    class ActionTypeFlow : AbstractSharedFlow<ActionType>()
+
+    class NavigationFlow : AbstractSharedFlow<NavigationStrategy>()
+
+    class ProgressFlow : AbstractStateFlow<Boolean>(false)
 }

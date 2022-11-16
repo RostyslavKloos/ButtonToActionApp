@@ -14,5 +14,5 @@ object ActivityModule {
 
     @Provides
     @Singleton
-    fun provideActionFlow(): Communication.Mutable<NavigationStrategy> = Communication.Navigation()
+    fun provideActionFlow(): Communication.Mutable<NavigationStrategy> = Communication.NavigationFlow()
 }

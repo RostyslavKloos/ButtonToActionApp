@@ -12,11 +12,12 @@ class MainActionModule(
     private val dispatchersList: DispatchersList,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
-    @ActionModule.IntentTypeMapper private val mapper: ActionResult.ActionResultMapper<Unit>,
+    private val progressFlow: Communication.Mutable<Boolean>,
+    private val mapper: ActionResult.ActionResultMapper<Unit>,
 ) : ViewModelModule<BaseActionViewModel.MainActionViewModel> {
     override fun viewModel(): BaseActionViewModel.MainActionViewModel {
         return BaseActionViewModel.MainActionViewModel(
-            dispatchersList, interactor, actionFlow, mapper
+            dispatchersList, interactor, actionFlow,progressFlow, mapper
         )
     }
 }
