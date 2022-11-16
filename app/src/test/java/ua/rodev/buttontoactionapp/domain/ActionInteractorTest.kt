@@ -2,6 +2,8 @@ package ua.rodev.buttontoactionapp.domain
 
 import com.google.gson.Gson
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTimeUtils
 import org.junit.Assert.assertNotEquals
@@ -9,6 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import ua.rodev.buttontoactionapp.core.ManageResources
+import ua.rodev.buttontoactionapp.core.NetworkMonitor
 import ua.rodev.buttontoactionapp.data.MainCheckValidDays
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloudToDomainMapper
@@ -25,6 +28,7 @@ class ActionInteractorTest {
     private lateinit var manageResources: TestManageResources
     private lateinit var usageHistory: TestUsageHistory
     private lateinit var handleError: HandleError<String>
+    private lateinit var networkMonitor: TestNetworkMonitor
 
     @Before
     fun setUp() {
@@ -32,12 +36,14 @@ class ActionInteractorTest {
         manageResources = TestManageResources()
         handleError = HandleUiError(manageResources)
         usageHistory = TestUsageHistory()
+        networkMonitor = TestNetworkMonitor()
         interactor = ActionInteractor.Main(
             repository,
             handleError,
             MainCheckValidDays(),
             usageHistory,
-            ActionDomainToActionResultMapper()
+            ActionDomainToActionResultMapper(),
+            networkMonitor
         )
     }
 
@@ -115,6 +121,40 @@ class ActionInteractorTest {
     //endregion
 
     @Test
+    fun `Fetch toast action fail if there is no internet connection`() = runBlocking {
+        val currentDay = LocalDate.now().dayOfWeek
+        val action = ActionDomain(ActionType.Toast, true, 1, listOf(currentDay.ordinal), 0)
+        repository.changeExpectedList(listOf(action))
+        manageResources.changeExpected("No available actions")
+        networkMonitor.changeConnection(false)
+
+        val firstCall = interactor.action(System.currentTimeMillis())
+        assertEquals(ActionResult.Failure("No available actions"), firstCall)
+
+        networkMonitor.changeConnection(true)
+
+        val secondCall = interactor.action(System.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Toast), secondCall)
+    }
+
+    @Test
+    fun `Fetch lower priority action between toast and another if there is no internet connection`() = runBlocking {
+        val currentDay = LocalDate.now().dayOfWeek
+        val toastAction = ActionDomain(ActionType.Toast, true, 10, listOf(currentDay.ordinal), 0)
+        val otherAction = ActionDomain(ActionType.Notification, true, 1, listOf(currentDay.ordinal), 0)
+        repository.changeExpectedList(listOf(toastAction, otherAction))
+        networkMonitor.changeConnection(false)
+
+        val firstCall = interactor.action(System.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Notification), firstCall)
+
+        networkMonitor.changeConnection(true)
+
+        val secondCall = interactor.action(System.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Toast), secondCall)
+    }
+
+    @Test
     fun `Fetch action success, high priority selected`() = runBlocking {
         val weekDays = listOf(0, 1, 2, 3, 4, 5, 6)
         val highPriorityAction = ActionDomain(ActionType.Call, true, 2, weekDays, 0)
@@ -166,7 +206,7 @@ class ActionInteractorTest {
      * 4. Fetching action after cooldown finished -> Success
      */
     @Test
-    fun `Fetch action success after coolDown period was finished1`() = runBlocking {
+    fun `Fetching several actions with different priority`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
         val action1 = ActionDomain(ActionType.Toast, true, 10, listOf(currentDay.ordinal), 7_200)
         val action2 = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3000)
@@ -237,10 +277,6 @@ class ActionInteractorTest {
         val coolDownHistory = mutableListOf<Long>()
         var actionKey = ""
 
-        fun clear() {
-            coolDownMap.clear()
-        }
-
         override fun save(data: Map<String, Long>) {
             coolDownMap.clear()
             coolDownMap.putAll(data)
@@ -252,6 +288,23 @@ class ActionInteractorTest {
         override fun read(): Map<String, Long> {
             println("map $coolDownMap")
             return coolDownMap
+        }
+
+        fun clear() {
+            coolDownMap.clear()
+        }
+    }
+
+    class TestNetworkMonitor: NetworkMonitor {
+
+        private var isOnline = false
+
+        override fun isOnlineFlow(): Flow<Boolean> = flowOf(true)
+
+        override fun isOnline(): Boolean = isOnline
+
+        fun changeConnection(connected: Boolean) {
+            isOnline = connected
         }
     }
 }

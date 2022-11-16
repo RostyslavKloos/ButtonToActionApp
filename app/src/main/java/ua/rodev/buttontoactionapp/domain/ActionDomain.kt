@@ -15,7 +15,11 @@ data class ActionDomain(
 
     fun <T> map(mapper: Mapper<T>): T = mapper.map(type)
 
-    fun canBeChosen() = enabled
+    fun isEnabled() = enabled
+
+    fun cantBeChosen(internetAvailable: Boolean): Boolean {
+        return type == ActionType.Toast && !internetAvailable
+    }
 
     fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.isValid(validDays)
 
