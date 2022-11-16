@@ -10,6 +10,7 @@ class HandleUiError(private val manageResources: ManageResources) : HandleError<
     override fun handle(e: Exception): String {
         return when (e) {
             is DomainException.NoInternetConnection -> manageResources.string(R.string.no_connection_message)
+            is DomainException.NoAvailableActions -> manageResources.string(R.string.no_available_actions)
             is DomainException.ActionOnCoolDown -> {
                 manageResources.string(R.string.error_action_on_cool_down, e.action)
             }

@@ -1,8 +1,5 @@
 package ua.rodev.buttontoactionapp.domain
 
-import ua.rodev.buttontoactionapp.R
-import ua.rodev.buttontoactionapp.core.ManageResources
-
 interface ActionInteractor {
 
     suspend fun action(currentTimeMills: Long): ActionResult
@@ -11,7 +8,6 @@ interface ActionInteractor {
     class Main(
         private val repository: ActionRepository,
         private val handleError: HandleError<String>,
-        private val manageResources: ManageResources,
         private val checkValidDays: CheckValidDays,
         private val usageHistory: ActionsTimeUsageHistoryStorage.Mutable,
         private val mapper: ActionDomain.Mapper<ActionResult>,
@@ -28,7 +24,7 @@ interface ActionInteractor {
                         lastTimeUsage == null || !it.onCoolDown(currentTimeMills, lastTimeUsage)
                     }
                 if (availableActions.isEmpty())
-                    return ActionResult.Failure(manageResources.string(R.string.no_available_actions))
+                    return ActionResult.Failure(handleError.handle(DomainException.NoAvailableActions))
                 var priorityAction = availableActions.first()
                 availableActions.forEach { action ->
                     if (action.higherPriorityThan(priorityAction)) priorityAction = action

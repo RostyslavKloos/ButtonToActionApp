@@ -35,13 +35,7 @@ class ActionInteractorTest {
         interactor = ActionInteractor.Main(
             repository,
             handleError,
-            manageResources,
             MainCheckValidDays(),
-//            FindActionWithoutCoolDown.Main(
-//                ActionDomainToActionResultMapper(),
-//                usageHistory,
-//                handleError
-//            ),
             usageHistory,
             ActionDomainToActionResultMapper()
         )
