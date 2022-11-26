@@ -1,8 +1,8 @@
 package ua.rodev.buttontoactionapp.data
 
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import okio.IOException
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
@@ -18,13 +18,13 @@ import java.net.UnknownHostException
 class MainActionRepositoryTest {
 
     private lateinit var repository: ActionRepository
-    private lateinit var cacheDataSource: TestCacheDataSource
-    private lateinit var cloudDataSource: TestCloudDataSource
+    private lateinit var cacheDataSource: FakeCacheDataSource
+    private lateinit var cloudDataSource: FakeCloudDataSource
 
     @Before
     fun setUp() {
-        cacheDataSource = TestCacheDataSource()
-        cloudDataSource = TestCloudDataSource()
+        cacheDataSource = FakeCacheDataSource()
+        cloudDataSource = FakeCloudDataSource()
         repository = MainActionRepository(
             cloudDataSource = cloudDataSource,
             cacheDataSource = cacheDataSource,
@@ -79,10 +79,9 @@ class MainActionRepositoryTest {
         return@runBlocking
     }
 
-    class TestCacheDataSource : CacheDataSource {
+    private class FakeCacheDataSource : CacheDataSource {
 
         private val actions = mutableListOf<ActionCloud>()
-        var fetchActionsCalled = 0
         var throwException = false
 
         override fun saveActions(actions: List<ActionCloud>) {
@@ -91,13 +90,12 @@ class MainActionRepositoryTest {
         }
 
         override suspend fun fetchActions(): List<ActionCloud> {
-            fetchActionsCalled++
             if (throwException) throw IOException()
             return actions
         }
     }
 
-    class TestCloudDataSource : CloudDataSource {
+    private class FakeCloudDataSource : CloudDataSource {
 
         private val actions = mutableListOf<ActionCloud>()
         private var internetConnectionAvailable = true

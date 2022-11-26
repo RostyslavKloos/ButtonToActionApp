@@ -1,13 +1,11 @@
 package ua.rodev.buttontoactionapp.domain
 
 import com.google.gson.Gson
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTimeUtils
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import ua.rodev.buttontoactionapp.core.ManageResources
@@ -24,19 +22,19 @@ import java.time.LocalDate
 class ActionInteractorTest {
 
     private lateinit var interactor: ActionInteractor
-    private lateinit var repository: TestRepository
-    private lateinit var manageResources: TestManageResources
-    private lateinit var usageHistory: TestUsageHistory
+    private lateinit var repository: FakeRepository
+    private lateinit var manageResources: FakeManageResources
+    private lateinit var usageHistory: FakeUsageHistory
     private lateinit var handleError: HandleError<String>
-    private lateinit var networkMonitor: TestNetworkMonitor
+    private lateinit var networkMonitor: FakeNetworkMonitor
 
     @Before
     fun setUp() {
-        repository = TestRepository(ActionCloudToDomainMapper())
-        manageResources = TestManageResources()
+        repository = FakeRepository(ActionCloudToDomainMapper())
+        manageResources = FakeManageResources()
         handleError = HandleUiError(manageResources)
-        usageHistory = TestUsageHistory()
-        networkMonitor = TestNetworkMonitor()
+        usageHistory = FakeUsageHistory()
+        networkMonitor = FakeNetworkMonitor()
         interactor = ActionInteractor.Main(
             repository,
             handleError,
@@ -186,16 +184,16 @@ class ActionInteractorTest {
         assertEquals(ActionResult.Success(ActionType.Toast), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
-//        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
-//        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
-//        assertEquals(ActionResult.Failure("toast action on coolDown"), secondCall)
-//
-//        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
-//        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
-//        assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
-//
-//        assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
-//        assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
+        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
+        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        assertEquals(ActionResult.Failure("toast action on coolDown"), secondCall)
+
+        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
+        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
+
+        assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
+        assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
 
     /**
@@ -230,7 +228,7 @@ class ActionInteractorTest {
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
 
-    class TestManageResources : ManageResources {
+    private class FakeManageResources : ManageResources {
 
         private var value = ""
 
@@ -242,7 +240,7 @@ class ActionInteractorTest {
         override fun string(id: Int, arg: String): String = value
     }
 
-    class TestRepository(
+    private class FakeRepository(
         private val mapper: ActionCloud.Mapper<ActionDomain>,
         private val path: String = "/mock.json",
         private val gson: Gson = Gson(),
@@ -271,7 +269,7 @@ class ActionInteractorTest {
         }
     }
 
-    class TestUsageHistory : ActionsTimeUsageHistoryStorage.Mutable {
+    private class FakeUsageHistory : ActionsTimeUsageHistoryStorage.Mutable {
 
         private val coolDownMap: MutableMap<String, Long> = mutableMapOf()
         val coolDownHistory = mutableListOf<Long>()
@@ -283,18 +281,14 @@ class ActionInteractorTest {
             data[actionKey]?.let {
                 coolDownHistory.add(it)
             }
-            println("SAVE $coolDownMap")
         }
 
-        override fun read(): Map<String, Long> {
-            println("map $coolDownMap")
-            return coolDownMap
-        }
+        override fun read(): Map<String, Long> = coolDownMap
 
         fun clear() = coolDownMap.clear()
     }
 
-    class TestNetworkMonitor: NetworkMonitor {
+    private class FakeNetworkMonitor: NetworkMonitor {
 
         private var isOnline = true
 
