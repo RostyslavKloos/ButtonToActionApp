@@ -9,7 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ua.rodev.buttontoactionapp.BuildConfig
-import ua.rodev.buttontoactionapp.core.DispatchersList
+import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.data.MainActionRepository
 import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
@@ -26,7 +26,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideDispatchersList(): DispatchersList = DispatchersList.Main()
+    fun provideDispatchersList(): CoroutineDispatchers = CoroutineDispatchers.Main()
 
     @Singleton
     @Provides

@@ -1,15 +1,14 @@
 package ua.rodev.buttontoactionapp.presentation.action
 
-import ua.rodev.buttontoactionapp.core.DispatchersList
+import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.presentation.Communication
-import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 
 class MainActionModule(
-    private val dispatchersList: DispatchersList,
+    private val dispatchersList: CoroutineDispatchers,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
     private val progressFlow: Communication.Mutable<Boolean>,

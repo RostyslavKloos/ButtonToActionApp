@@ -13,10 +13,13 @@ class ActionCloudToDomainMapper : ActionCloud.Mapper<ActionDomain> {
         validDays: List<Int>,
         coolDown: Long,
     ): ActionDomain {
-        val actionType = ActionType.values().find {
-            it.value == type
-        } ?: throw DomainException.WrongActionType
-
+        val actionType = when (type) {
+            ActionType.Toast.value -> ActionType.Toast
+            ActionType.Notification.value -> ActionType.Notification
+            ActionType.Call.value -> ActionType.Call
+            ActionType.Animation.value -> ActionType.Animation
+            else -> throw DomainException.WrongActionType
+        }
         return ActionDomain(actionType, enabled, priority, validDays, coolDown)
     }
 }

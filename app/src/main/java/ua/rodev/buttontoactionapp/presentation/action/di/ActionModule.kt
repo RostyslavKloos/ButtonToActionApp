@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ua.rodev.buttontoactionapp.core.DispatchersList
+import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.core.Log
 import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
@@ -33,6 +33,7 @@ object ActionModule {
     annotation class ContactTypeMapper
 
     @Provides
+    @Singleton
     fun provideActionFlow(): Communication.Mutable<ActionType> = Communication.ActionTypeFlow()
 
     @Provides
@@ -41,6 +42,7 @@ object ActionModule {
     fun provideProgressFlow(): Communication.Mutable<Boolean> = Communication.ProgressFlow()
 
     @Provides
+    @Singleton
     fun provideActionNavigation(
         navigationCommunication: Communication.Mutable<NavigationStrategy>,
     ): Communication.Update<NavigationStrategy> = navigationCommunication
@@ -63,7 +65,7 @@ object ActionModule {
 
     @Provides
     fun provideActionWithNavigationModule(
-        dispatchersList: DispatchersList,
+        dispatchersList: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
@@ -75,7 +77,7 @@ object ActionModule {
 
     @Provides
     fun provideMainActionModule(
-        dispatchersList: DispatchersList,
+        dispatchersList: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,

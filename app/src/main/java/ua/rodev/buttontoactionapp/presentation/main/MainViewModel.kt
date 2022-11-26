@@ -16,19 +16,14 @@ class MainViewModel @Inject constructor(
     private val communicationFlow: Communication.Mutable<NavigationStrategy>,
 ) : ViewModel(), Communication.Observe<NavigationStrategy> {
 
-    fun init() {
-        viewModelScope.launch {
-            communicationFlow.map(NavigationStrategy.Replace(Screen.Action))
-        }
+    fun init() = viewModelScope.launch {
+        communicationFlow.map(NavigationStrategy.Replace(Screen.Action))
     }
 
-    fun replace(screen: Screen) {
-        viewModelScope.launch {
-            communicationFlow.map(NavigationStrategy.Replace(screen))
-        }
+    fun replace(screen: Screen) = viewModelScope.launch {
+        communicationFlow.map(NavigationStrategy.Replace(screen))
     }
 
-    override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) {
+    override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) =
         communicationFlow.collect(owner, collector)
-    }
 }

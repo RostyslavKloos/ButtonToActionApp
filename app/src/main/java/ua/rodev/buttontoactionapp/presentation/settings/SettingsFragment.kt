@@ -17,18 +17,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        with(binding) {
-            switchCompose.apply {
-                isChecked = viewModel.isComposeUsed()
-                setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.useCompose(isChecked)
-                }
+        binding.switchCompose.apply {
+            isChecked = viewModel.isComposeUsed()
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.useCompose(isChecked)
             }
-            switchContactsScreen.apply {
-                isChecked = viewModel.isContactsScreenUsed()
-                setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.useContactsScreen(isChecked)
-                }
+        }
+        binding.switchContactsScreen.apply {
+            isChecked = viewModel.isContactsScreenUsed()
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.useContactsScreen(isChecked)
             }
         }
     }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.ContactsContract
-import ua.rodev.buttontoactionapp.presentation.contacts.ContactUi
 
 class ContactUiCallMapper(private val context: Context) : ContactUi.Call {
     override fun call(id: Long) {

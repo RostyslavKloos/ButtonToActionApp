@@ -1,6 +1,5 @@
 package ua.rodev.buttontoactionapp.presentation.action
 
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTimeUtils
-import ua.rodev.buttontoactionapp.core.DispatchersList
+import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
@@ -18,7 +17,7 @@ import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 import javax.inject.Inject
 
 abstract class BaseActionViewModel(
-    private val dispatchersList: DispatchersList,
+    private val dispatchersList: CoroutineDispatchers,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
     private val progressFlow: Communication.Mutable<Boolean>,
@@ -46,7 +45,7 @@ abstract class BaseActionViewModel(
 
     @HiltViewModel
     class MainActionViewModel @Inject constructor(
-        dispatchersList: DispatchersList,
+        dispatchersList: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
@@ -55,7 +54,7 @@ abstract class BaseActionViewModel(
 
     @HiltViewModel
     class ActionWithNavigationViewModel @Inject constructor(
-        dispatchersList: DispatchersList,
+        dispatchersList: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
