@@ -65,25 +65,25 @@ object ActionModule {
 
     @Provides
     fun provideActionWithNavigationModule(
-        dispatchersList: CoroutineDispatchers,
+        dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
-            dispatchersList, interactor, actionFlow, progressFlow, mapper
+            dispatchers, interactor, actionFlow, progressFlow, mapper
         )
 
     @Provides
     fun provideMainActionModule(
-        dispatchersList: CoroutineDispatchers,
+        dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
-        dispatchersList, interactor, actionFlow,progressFlow, mapper
+        dispatchers, interactor, actionFlow,progressFlow, mapper
     )
 
     @Provides

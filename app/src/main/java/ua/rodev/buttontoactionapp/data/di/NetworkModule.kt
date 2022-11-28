@@ -26,7 +26,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideDispatchersList(): CoroutineDispatchers = CoroutineDispatchers.Main()
+    fun provideCoroutineDispatchers(): CoroutineDispatchers = CoroutineDispatchers.Main()
 
     @Singleton
     @Provides

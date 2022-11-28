@@ -8,7 +8,7 @@ import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.presentation.Communication
 
 class ActionWithNavigationModule(
-    private val dispatchersList: CoroutineDispatchers,
+    private val dispatchers: CoroutineDispatchers,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
     private val progressFlow: Communication.Mutable<Boolean>,
@@ -16,7 +16,7 @@ class ActionWithNavigationModule(
 ) : ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> {
     override fun viewModel(): BaseActionViewModel.ActionWithNavigationViewModel {
         return BaseActionViewModel.ActionWithNavigationViewModel(
-            dispatchersList, interactor, actionFlow, progressFlow, mapper
+            dispatchers, interactor, actionFlow, progressFlow, mapper
         )
     }
 }

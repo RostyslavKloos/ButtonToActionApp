@@ -17,7 +17,7 @@ import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 import javax.inject.Inject
 
 abstract class BaseActionViewModel(
-    private val dispatchersList: CoroutineDispatchers,
+    private val dispatchers: CoroutineDispatchers,
     private val interactor: ActionInteractor,
     private val actionFlow: Communication.Mutable<ActionType>,
     private val progressFlow: Communication.Mutable<Boolean>,
@@ -35,7 +35,7 @@ abstract class BaseActionViewModel(
     fun performAction() {
         viewModelScope.launch {
             progressFlow.map(true)
-            withContext(dispatchersList.io()) {
+            withContext(dispatchers.io()) {
                 val action = interactor.action(DateTimeUtils.currentTimeMillis())
                 action.map(mapper)
             }
@@ -45,19 +45,19 @@ abstract class BaseActionViewModel(
 
     @HiltViewModel
     class MainActionViewModel @Inject constructor(
-        dispatchersList: CoroutineDispatchers,
+        dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @ActionModule.IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, progressFlow, mapper)
+    ) : BaseActionViewModel(dispatchers, interactor, actionFlow, progressFlow, mapper)
 
     @HiltViewModel
     class ActionWithNavigationViewModel @Inject constructor(
-        dispatchersList: CoroutineDispatchers,
+        dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Communication.Mutable<ActionType>,
         @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
         @ActionModule.ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchersList, interactor, actionFlow, progressFlow, mapper)
+    ) : BaseActionViewModel(dispatchers, interactor, actionFlow, progressFlow, mapper)
 }

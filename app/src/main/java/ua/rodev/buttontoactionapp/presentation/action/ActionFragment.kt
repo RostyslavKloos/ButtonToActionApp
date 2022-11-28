@@ -16,6 +16,10 @@ import ua.rodev.buttontoactionapp.core.viewBinding
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
 import ua.rodev.buttontoactionapp.data.cache.SettingsPreferences
 import ua.rodev.buttontoactionapp.databinding.FragmentActionBinding
+import ua.rodev.buttontoactionapp.presentation.action.actions.AnimationAction
+import ua.rodev.buttontoactionapp.presentation.action.actions.CallAction
+import ua.rodev.buttontoactionapp.presentation.action.actions.NotificationAction
+import ua.rodev.buttontoactionapp.presentation.action.actions.ToastAction
 import ua.rodev.buttontoactionapp.presentation.main.MyLifecycleObserver
 import javax.inject.Inject
 
@@ -84,11 +88,4 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
             NotificationAction(requireContext()).perform()
         }
     }
-}
-
-interface HandleAction {
-    fun showAnimation()
-    fun showToast()
-    fun call()
-    fun showNotification()
 }

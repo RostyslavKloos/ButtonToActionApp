@@ -1,7 +1,8 @@
-package ua.rodev.buttontoactionapp.presentation.action
+package ua.rodev.buttontoactionapp.presentation.action.actions
 
 import android.content.Context
 import android.widget.Toast
+import ua.rodev.buttontoactionapp.presentation.action.ActionUi
 import javax.inject.Inject
 
 class ToastAction @Inject constructor(

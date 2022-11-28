@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.presentation.action
+package ua.rodev.buttontoactionapp.presentation.action.actions
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import ua.rodev.buttontoactionapp.R
+import ua.rodev.buttontoactionapp.presentation.action.ActionUi
 import ua.rodev.buttontoactionapp.presentation.main.MainActivity
 
 class NotificationAction(

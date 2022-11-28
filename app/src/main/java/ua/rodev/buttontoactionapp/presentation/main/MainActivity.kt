@@ -8,8 +8,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.presentation.Screen
-import ua.rodev.buttontoactionapp.presentation.action.CallAction
-import ua.rodev.buttontoactionapp.presentation.action.NotificationAction
+import ua.rodev.buttontoactionapp.presentation.action.actions.CallAction
+import ua.rodev.buttontoactionapp.presentation.action.actions.NotificationAction
 import javax.inject.Inject
 
 @AndroidEntryPoint

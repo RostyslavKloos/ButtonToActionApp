@@ -1,9 +1,10 @@
-package ua.rodev.buttontoactionapp.presentation.action
+package ua.rodev.buttontoactionapp.presentation.action.actions
 
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.Button
+import ua.rodev.buttontoactionapp.presentation.action.ActionUi
 
 class AnimationAction(
     private val button: Button,
