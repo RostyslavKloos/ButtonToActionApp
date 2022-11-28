@@ -8,7 +8,7 @@
       1,
       3
     ],
-    "cool_down": 86400000
+    "cool_down": 3000
   },
   {
     "type": "toast",
