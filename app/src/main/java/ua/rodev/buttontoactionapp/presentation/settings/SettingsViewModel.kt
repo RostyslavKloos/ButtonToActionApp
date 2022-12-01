@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
-import ua.rodev.buttontoactionapp.presentation.Communication
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Screen
+import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.settings.di.SettingsModule
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ class SettingsViewModel @Inject constructor(
     private val useComposePreferences: SettingsConfiguration.Mutable,
     @SettingsModule.UseContactsScreenPreferences
     private val useContactsPreferences: SettingsConfiguration.Mutable,
-    private val communicationFlow: Communication.Mutable<NavigationStrategy>
+    private val navigationTarget: Target.Mutable<NavigationStrategy>
 ) : ViewModel() {
 
     fun useCompose(value: Boolean) = useComposePreferences.save(value)
@@ -31,9 +31,9 @@ class SettingsViewModel @Inject constructor(
     fun recreateFragment() {
         viewModelScope.launch {
             if (isComposeUsed()) {
-                communicationFlow.map(NavigationStrategy.Replace(Screen.SettingsCompose))
+                navigationTarget.map(NavigationStrategy.Replace(Screen.SettingsCompose))
             } else {
-                communicationFlow.map(NavigationStrategy.Replace(Screen.Settings))
+                navigationTarget.map(NavigationStrategy.Replace(Screen.Settings))
             }
         }
     }

@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ua.rodev.buttontoactionapp.presentation.Communication
+import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import javax.inject.Singleton
 
@@ -14,5 +14,5 @@ object ActivityModule {
 
     @Provides
     @Singleton
-    fun provideActionFlow(): Communication.Mutable<NavigationStrategy> = Communication.NavigationFlow()
+    fun provideActionTarget(): Target.Mutable<NavigationStrategy> = Target.NavigationTarget()
 }

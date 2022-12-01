@@ -10,7 +10,7 @@ import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.presentation.Communication
+import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.action.*
 import javax.inject.Qualifier
@@ -34,31 +34,31 @@ object ActionModule {
 
     @Provides
     @Singleton
-    fun provideActionFlow(): Communication.Mutable<ActionType> = Communication.ActionTypeFlow()
+    fun provideActionFlow(): ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType> = Target.ActionTypeTarget()
 
     @Provides
     @Singleton
     @ActionProgressFlow
-    fun provideProgressFlow(): Communication.Mutable<Boolean> = Communication.ProgressFlow()
+    fun provideProgressFlow(): ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean> = Target.ProgressTarget()
 
     @Provides
     @Singleton
     fun provideActionNavigation(
-        navigationCommunication: Communication.Mutable<NavigationStrategy>,
-    ): Communication.Update<NavigationStrategy> = navigationCommunication
+        navigationCommunication: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<NavigationStrategy>,
+    ): ua.rodev.buttontoactionapp.presentation.Communication.Target.Update<NavigationStrategy> = navigationCommunication
 
     @Provides
     @IntentTypeMapper
     fun provideActionResultIntentTypeMapper(
-        actionFlow: Communication.Mutable<ActionType>,
+        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
         log: Log,
     ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, log)
 
     @Provides
     @ContactTypeMapper
     fun provideActionResultContactTypeMapper(
-        navigationFlow: Communication.Update<NavigationStrategy>,
-        actionFlow: Communication.Mutable<ActionType>,
+        navigationFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Update<NavigationStrategy>,
+        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
         log: Log,
     ): ActionResult.ActionResultMapper<Unit> =
         ActionResultNavigationMapper(navigationFlow, actionFlow, log)
@@ -67,8 +67,8 @@ object ActionModule {
     fun provideActionWithNavigationModule(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: Communication.Mutable<ActionType>,
-        @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
+        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
+        @ActionProgressFlow progressFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
@@ -79,8 +79,8 @@ object ActionModule {
     fun provideMainActionModule(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: Communication.Mutable<ActionType>,
-        @ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
+        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
+        @ActionProgressFlow progressFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
     ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
         dispatchers, interactor, actionFlow,progressFlow, mapper

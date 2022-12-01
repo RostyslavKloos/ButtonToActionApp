@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.core.SuspendMapper
 import ua.rodev.buttontoactionapp.domain.ActionType
 
-interface Communication {
+interface Target {
 
     interface Observe<T> {
         fun collect(owner: LifecycleOwner, collector: FlowCollector<T>)
@@ -19,8 +19,8 @@ interface Communication {
 
     interface Mutable<T> : Observe<T>, Update<T>
 
-    abstract class AbstractSharedFlow<T>(
-        private val flow: MutableSharedFlow<T> = MutableSharedFlow(),
+    abstract class AbstractFlow<T>(
+        private val flow: MutableSharedFlow<T>,
     ) : Mutable<T> {
         override fun collect(owner: LifecycleOwner, collector: FlowCollector<T>) {
             owner.lifecycleScope.launch {
@@ -30,23 +30,19 @@ interface Communication {
 
         override suspend fun map(source: T) = flow.emit(source)
     }
+
+    abstract class AbstractSharedFlow<T>(
+        flow: MutableSharedFlow<T> = MutableSharedFlow(),
+    ) : AbstractFlow<T>(flow)
 
     abstract class AbstractStateFlow<T>(
         private val initialValue: T,
-        private val flow: MutableStateFlow<T> = MutableStateFlow(initialValue),
-    ) : Mutable<T> {
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<T>) {
-            owner.lifecycleScope.launch {
-                flow.collect(collector)
-            }
-        }
+        flow: MutableStateFlow<T> = MutableStateFlow(initialValue),
+    ) : AbstractFlow<T>(flow)
 
-        override suspend fun map(source: T) = flow.emit(source)
-    }
+    class ActionTypeTarget : AbstractSharedFlow<ActionType>()
 
-    class ActionTypeFlow : AbstractSharedFlow<ActionType>()
+    class NavigationTarget : AbstractSharedFlow<NavigationStrategy>()
 
-    class NavigationFlow : AbstractSharedFlow<NavigationStrategy>()
-
-    class ProgressFlow : AbstractStateFlow<Boolean>(false)
+    class ProgressTarget : AbstractStateFlow<Boolean>(false)
 }

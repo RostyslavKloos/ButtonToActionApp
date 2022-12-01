@@ -12,34 +12,34 @@ import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.presentation.Communication
+import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.action.di.ActionModule
 import javax.inject.Inject
 
 abstract class BaseActionViewModel(
     private val dispatchers: CoroutineDispatchers,
     private val interactor: ActionInteractor,
-    private val actionFlow: Communication.Mutable<ActionType>,
-    private val progressFlow: Communication.Mutable<Boolean>,
+    private val actionTarget: Target.Mutable<ActionType>,
+    private val progressTarget: Target.Mutable<Boolean>,
     private val mapper: ActionResult.ActionResultMapper<Unit>,
-) : ViewModel(), Communication.Observe<ActionType>{
+) : ViewModel(), Target.Observe<ActionType>{
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
-        actionFlow.collect(owner, collector)
+        actionTarget.collect(owner, collector)
     }
 
     fun collectProgress(owner: LifecycleOwner, collector: FlowCollector<Boolean>) {
-        progressFlow.collect(owner, collector)
+        progressTarget.collect(owner, collector)
     }
 
     fun performAction() {
         viewModelScope.launch {
-            progressFlow.map(true)
+            progressTarget.map(true)
             withContext(dispatchers.io()) {
                 val action = interactor.action(DateTimeUtils.currentTimeMillis())
                 action.map(mapper)
             }
-            progressFlow.map(false)
+            progressTarget.map(false)
         }
     }
 
@@ -47,17 +47,17 @@ abstract class BaseActionViewModel(
     class MainActionViewModel @Inject constructor(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: Communication.Mutable<ActionType>,
-        @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
+        actionTarget: Target.Mutable<ActionType>,
+        @ActionModule.ActionProgressFlow progressFlow: Target.Mutable<Boolean>,
         @ActionModule.IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchers, interactor, actionFlow, progressFlow, mapper)
+    ) : BaseActionViewModel(dispatchers, interactor, actionTarget, progressFlow, mapper)
 
     @HiltViewModel
     class ActionWithNavigationViewModel @Inject constructor(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: Communication.Mutable<ActionType>,
-        @ActionModule.ActionProgressFlow progressFlow: Communication.Mutable<Boolean>,
+        actionTarget: Target.Mutable<ActionType>,
+        @ActionModule.ActionProgressFlow progressFlow: Target.Mutable<Boolean>,
         @ActionModule.ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchers, interactor, actionFlow, progressFlow, mapper)
+    ) : BaseActionViewModel(dispatchers, interactor, actionTarget, progressFlow, mapper)
 }

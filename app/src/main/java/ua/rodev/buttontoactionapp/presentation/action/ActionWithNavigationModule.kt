@@ -5,18 +5,18 @@ import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.domain.ActionResult
-import ua.rodev.buttontoactionapp.presentation.Communication
+import ua.rodev.buttontoactionapp.presentation.Target
 
 class ActionWithNavigationModule(
     private val dispatchers: CoroutineDispatchers,
     private val interactor: ActionInteractor,
-    private val actionFlow: Communication.Mutable<ActionType>,
-    private val progressFlow: Communication.Mutable<Boolean>,
+    private val actionTarget: Target.Mutable<ActionType>,
+    private val progressTarget: Target.Mutable<Boolean>,
     private val mapper: ActionResult.ActionResultMapper<Unit>,
 ) : ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> {
     override fun viewModel(): BaseActionViewModel.ActionWithNavigationViewModel {
         return BaseActionViewModel.ActionWithNavigationViewModel(
-            dispatchers, interactor, actionFlow, progressFlow, mapper
+            dispatchers, interactor, actionTarget, progressTarget, mapper
         )
     }
 }
