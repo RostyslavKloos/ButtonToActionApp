@@ -21,6 +21,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             isChecked = viewModel.isComposeUsed()
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.useCompose(isChecked)
+                viewModel.recreateFragment()
             }
         }
         binding.switchContactsScreen.apply {
