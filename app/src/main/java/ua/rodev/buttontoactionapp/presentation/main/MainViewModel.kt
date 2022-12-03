@@ -17,11 +17,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val navigationTarget: Target.Mutable<NavigationStrategy>,
     @SettingsModule.UseComposePreferences
-    private val settings: SettingsConfiguration.Mutable
+    private val settings: SettingsConfiguration.Mutable,
 ) : ViewModel(), Target.Observe<NavigationStrategy> {
 
     fun init() = viewModelScope.launch {
-        navigationTarget.map(NavigationStrategy.Replace(Screen.Action))
+        replace(Screen.Action)
     }
 
     fun replace(screen: Screen) = viewModelScope.launch {

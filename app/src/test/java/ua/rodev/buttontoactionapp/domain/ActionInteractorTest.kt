@@ -30,8 +30,8 @@ class ActionInteractorTest {
 
     @Before
     fun setUp() {
-        repository = FakeRepository(ActionCloudToDomainMapper())
         manageResources = FakeManageResources()
+        repository = FakeRepository(ActionCloudToDomainMapper(manageResources))
         handleError = HandleUiError(manageResources)
         usageHistory = FakeUsageHistory()
         networkMonitor = FakeNetworkMonitor()
@@ -121,7 +121,7 @@ class ActionInteractorTest {
     @Test
     fun `Fetch toast action fail if there is no internet connection`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action = ActionDomain(ActionType.Toast, true, 1, listOf(currentDay.ordinal), 0)
+        val action = ActionDomain(ActionType.Toast(""), true, 1, listOf(currentDay.ordinal), 0)
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("No available actions")
         networkMonitor.changeConnection(false)
@@ -132,13 +132,13 @@ class ActionInteractorTest {
         networkMonitor.changeConnection(true)
 
         val secondCall = interactor.action(System.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), secondCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), secondCall)
     }
 
     @Test
     fun `Fetch lower priority action between toast and another if there is no internet connection`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val toastAction = ActionDomain(ActionType.Toast, true, 10, listOf(currentDay.ordinal), 0)
+        val toastAction = ActionDomain(ActionType.Toast(""), true, 10, listOf(currentDay.ordinal), 0)
         val otherAction = ActionDomain(ActionType.Notification, true, 1, listOf(currentDay.ordinal), 0)
         repository.changeExpectedList(listOf(toastAction, otherAction))
         networkMonitor.changeConnection(false)
@@ -149,7 +149,7 @@ class ActionInteractorTest {
         networkMonitor.changeConnection(true)
 
         val secondCall = interactor.action(System.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), secondCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), secondCall)
     }
 
     @Test
@@ -174,14 +174,14 @@ class ActionInteractorTest {
     @Test
     fun `Fetch action success after coolDown period was finished`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action = ActionDomain(ActionType.Toast, true, 1, listOf(currentDay.ordinal), 7_200)
+        val action = ActionDomain(ActionType.Toast(""), true, 1, listOf(currentDay.ordinal), 7_200)
         usageHistory.clear()
-        usageHistory.actionKey = ActionType.Toast.value
+        usageHistory.actionKey = ActionType.Toast("").value
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("${action.mapToDomainException().action} action on coolDown")
 
         val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), firstCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
@@ -190,7 +190,7 @@ class ActionInteractorTest {
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
         val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), thirdCall)
 
         assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
@@ -206,15 +206,15 @@ class ActionInteractorTest {
     @Test
     fun `Fetching several actions with different priority`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action1 = ActionDomain(ActionType.Toast, true, 10, listOf(currentDay.ordinal), 7_200)
+        val action1 = ActionDomain(ActionType.Toast(""), true, 10, listOf(currentDay.ordinal), 7_200)
         val action2 = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3000)
         usageHistory.clear()
-        usageHistory.actionKey = ActionType.Toast.value
+        usageHistory.actionKey = ActionType.Toast("").value
         repository.changeExpectedList(listOf(action1, action2))
         manageResources.changeExpected("${action1.mapToDomainException().action} action on coolDown")
 
         val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), firstCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
@@ -224,7 +224,7 @@ class ActionInteractorTest {
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
         val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast), thirdCall)
+        assertEquals(ActionResult.Success(ActionType.Toast("")), thirdCall)
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
 

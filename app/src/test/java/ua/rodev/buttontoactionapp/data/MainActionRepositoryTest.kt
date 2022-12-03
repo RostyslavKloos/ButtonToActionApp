@@ -5,6 +5,7 @@ import okio.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import ua.rodev.buttontoactionapp.core.ManageResources
 import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloudToDomainMapper
@@ -20,15 +21,17 @@ class MainActionRepositoryTest {
     private lateinit var repository: ActionRepository
     private lateinit var cacheDataSource: FakeCacheDataSource
     private lateinit var cloudDataSource: FakeCloudDataSource
+    private lateinit var manageResources: FakeManageResources
 
     @Before
     fun setUp() {
         cacheDataSource = FakeCacheDataSource()
         cloudDataSource = FakeCloudDataSource()
+        manageResources = FakeManageResources()
         repository = MainActionRepository(
             cloudDataSource = cloudDataSource,
             cacheDataSource = cacheDataSource,
-            mapper = ActionCloudToDomainMapper(),
+            mapper = ActionCloudToDomainMapper(manageResources),
             handleError = HandleDomainError()
         )
     }
@@ -39,7 +42,7 @@ class MainActionRepositoryTest {
         cloudDataSource.replaceData(listOf(ActionCloud("toast", true, 1, emptyList(), 0)))
         cacheDataSource.saveActions(listOf())
 
-        val expected = listOf(ActionDomain(ActionType.Toast, true, 1, emptyList(), 0))
+        val expected = listOf(ActionDomain(ActionType.Toast(""), true, 1, emptyList(), 0))
         val actual = repository.fetchActions()
 
         assertEquals(expected, actual)
@@ -61,7 +64,7 @@ class MainActionRepositoryTest {
         val action = ActionCloud("toast", true, 1, listOf(), 0)
         cacheDataSource.saveActions(listOf(action))
 
-        val expected = listOf(ActionDomain(ActionType.Toast, true, 1, listOf(), 0))
+        val expected = listOf(ActionDomain(ActionType.Toast(""), true, 1, listOf(), 0))
         val actual = repository.fetchActions()
 
         assertEquals(expected, actual)
@@ -114,5 +117,18 @@ class MainActionRepositoryTest {
             actions.clear()
             actions.addAll(data)
         }
+    }
+
+
+    private class FakeManageResources : ManageResources {
+
+        private var value = ""
+
+        fun changeExpected(source: String) {
+            value = source
+        }
+
+        override fun string(id: Int): String = value
+        override fun string(id: Int, arg: String): String = value
     }
 }

@@ -22,7 +22,8 @@ abstract class BaseActionViewModel(
     private val actionTarget: Target.Mutable<ActionType>,
     private val progressTarget: Target.Mutable<Boolean>,
     private val mapper: ActionResult.ActionResultMapper<Unit>,
-) : ViewModel(), Target.Observe<ActionType>{
+    private val snackbarTarget: Target.Mutable<String>,
+) : ViewModel(), Target.Observe<ActionType> {
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
         actionTarget.collect(owner, collector)
@@ -30,6 +31,10 @@ abstract class BaseActionViewModel(
 
     fun collectProgress(owner: LifecycleOwner, collector: FlowCollector<Boolean>) {
         progressTarget.collect(owner, collector)
+    }
+
+    fun collectSnackbar(owner: LifecycleOwner, collector: FlowCollector<String>) {
+        snackbarTarget.collect(owner, collector)
     }
 
     fun performAction() {
@@ -48,16 +53,32 @@ abstract class BaseActionViewModel(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionTarget: Target.Mutable<ActionType>,
-        @ActionModule.ActionProgressFlow progressFlow: Target.Mutable<Boolean>,
+        @ActionModule.ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
         @ActionModule.IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchers, interactor, actionTarget, progressFlow, mapper)
+        @ActionModule.ActionSnackbar snackbarTarget: Target.Mutable<String>,
+    ) : BaseActionViewModel(
+        dispatchers,
+        interactor,
+        actionTarget,
+        progressFlow,
+        mapper,
+        snackbarTarget
+    )
 
     @HiltViewModel
     class ActionWithNavigationViewModel @Inject constructor(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionTarget: Target.Mutable<ActionType>,
-        @ActionModule.ActionProgressFlow progressFlow: Target.Mutable<Boolean>,
+        @ActionModule.ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
         @ActionModule.ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    ) : BaseActionViewModel(dispatchers, interactor, actionTarget, progressFlow, mapper)
+        @ActionModule.ActionSnackbar snackbarTarget: Target.Mutable<String>,
+    ) : BaseActionViewModel(
+        dispatchers,
+        interactor,
+        actionTarget,
+        progressFlow,
+        mapper,
+        snackbarTarget
+    )
 }

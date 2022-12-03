@@ -5,13 +5,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
-import ua.rodev.buttontoactionapp.core.Log
 import ua.rodev.buttontoactionapp.core.ViewModelModule
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
+import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.action.*
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -22,7 +21,11 @@ object ActionModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ActionProgressFlow
+    annotation class ActionProgressTarget
+
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    annotation class ActionSnackbar
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
@@ -34,56 +37,63 @@ object ActionModule {
 
     @Provides
     @Singleton
-    fun provideActionFlow(): ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType> = Target.ActionTypeTarget()
+    fun provideActionFlow(): Target.Mutable<ActionType> = Target.ActionTypeTarget()
 
     @Provides
     @Singleton
-    @ActionProgressFlow
-    fun provideProgressFlow(): ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean> = Target.ProgressTarget()
+    @ActionProgressTarget
+    fun provideProgressTarget(): Target.Mutable<Boolean> = Target.ProgressTarget()
 
     @Provides
     @Singleton
-    fun provideActionNavigation(
-        navigationCommunication: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<NavigationStrategy>,
-    ): ua.rodev.buttontoactionapp.presentation.Communication.Target.Update<NavigationStrategy> = navigationCommunication
+    fun provideActionNavigationTarget(
+        navigationTarget: Target.Mutable<NavigationStrategy>,
+    ): Target.Update<NavigationStrategy> = navigationTarget
+
+    @Provides
+    @Singleton
+    @ActionSnackbar
+    fun provideActionSnackbar(): Target.Mutable<String> = Target.ActionSnackbarTarget()
 
     @Provides
     @IntentTypeMapper
     fun provideActionResultIntentTypeMapper(
-        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
-        log: Log,
-    ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, log)
+        actionFlow: Target.Mutable<ActionType>,
+        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
+    ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, snackbarTarget)
 
     @Provides
     @ContactTypeMapper
     fun provideActionResultContactTypeMapper(
-        navigationFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Update<NavigationStrategy>,
-        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
-        log: Log,
+        navigationTarget: Target.Update<NavigationStrategy>,
+        actionTarget: Target.Mutable<ActionType>,
+        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
     ): ActionResult.ActionResultMapper<Unit> =
-        ActionResultNavigationMapper(navigationFlow, actionFlow, log)
+        ActionResultNavigationMapper(navigationTarget, actionTarget, snackbarTarget)
 
     @Provides
     fun provideActionWithNavigationModule(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
-        @ActionProgressFlow progressFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean>,
+        actionFlow: Target.Mutable<ActionType>,
+        @ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
+        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
     ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
-            dispatchers, interactor, actionFlow, progressFlow, mapper
+            dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
         )
 
     @Provides
     fun provideMainActionModule(
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
-        actionFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<ActionType>,
-        @ActionProgressFlow progressFlow: ua.rodev.buttontoactionapp.presentation.Communication.Target.Mutable<Boolean>,
+        actionFlow: Target.Mutable<ActionType>,
+        @ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
+        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
     ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
-        dispatchers, interactor, actionFlow,progressFlow, mapper
+        dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
     )
 
     @Provides

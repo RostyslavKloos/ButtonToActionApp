@@ -4,12 +4,12 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.core.viewBinding
@@ -28,6 +28,7 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
     private val binding by viewBinding(FragmentActionBinding::bind)
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
     @Inject
     lateinit var dependencyContainer: DependencyContainer
     lateinit var viewModel: BaseActionViewModel
@@ -48,15 +49,9 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
-            if (isGranted) {
-                showNotification()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.notification_permission_denied),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            if (isGranted) showNotification()
+            else
+                showToast(getString(R.string.notification_permission_denied))
         }
 
         viewModel.collectProgress(viewLifecycleOwner) {
@@ -64,6 +59,10 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
                 progressBar.isVisible = it
                 btnAction.isVisible = !it
             }
+        }
+
+        viewModel.collectSnackbar(viewLifecycleOwner) {
+            Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
         }
 
         viewModel.collect(viewLifecycleOwner) {
@@ -77,7 +76,7 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
     override fun showAnimation() = AnimationAction(binding.btnAction).perform()
 
-    override fun showToast() = ToastAction(requireContext()).perform()
+    override fun showToast(message: String) = ToastAction(requireContext(), message).perform()
 
     override fun call() = CallAction(observer.resultLauncher).perform()
 

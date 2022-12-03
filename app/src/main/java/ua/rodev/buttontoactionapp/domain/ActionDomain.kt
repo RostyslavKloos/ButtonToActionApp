@@ -18,7 +18,7 @@ data class ActionDomain(
     fun isEnabled() = enabled
 
     fun cantBeChosen(internetAvailable: Boolean): Boolean {
-        return type == ActionType.Toast && !internetAvailable
+        return type is ActionType.Toast && !internetAvailable
     }
 
     fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.isValid(validDays)

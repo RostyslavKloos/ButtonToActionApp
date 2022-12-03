@@ -13,10 +13,11 @@ class MainActionModule(
     private val actionTarget: Target.Mutable<ActionType>,
     private val progressTarget: Target.Mutable<Boolean>,
     private val mapper: ActionResult.ActionResultMapper<Unit>,
+    private val snackbarTarget: Target.Mutable<String>
 ) : ViewModelModule<BaseActionViewModel.MainActionViewModel> {
     override fun viewModel(): BaseActionViewModel.MainActionViewModel {
         return BaseActionViewModel.MainActionViewModel(
-            dispatchers, interactor, actionTarget,progressTarget, mapper
+            dispatchers, interactor, actionTarget,progressTarget, mapper, snackbarTarget
         )
     }
 }

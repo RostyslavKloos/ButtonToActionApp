@@ -14,8 +14,8 @@ sealed class ActionType(val value: String) : Parcelable {
         override fun handle(actionUi: HandleAction) = actionUi.showAnimation()
     }
 
-    object Toast : ActionType("toast") {
-        override fun handle(actionUi: HandleAction) = actionUi.showToast()
+    data class Toast(private val message: String) : ActionType("toast") {
+        override fun handle(actionUi: HandleAction) = actionUi.showToast(message)
     }
 
     object Notification : ActionType("notification") {
