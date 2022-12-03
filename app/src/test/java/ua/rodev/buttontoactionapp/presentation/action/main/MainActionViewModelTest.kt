@@ -1,24 +1,15 @@
 package ua.rodev.buttontoactionapp.presentation.action.main
 
 import android.view.View
-import androidx.lifecycle.LifecycleOwner
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
-import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
-import ua.rodev.buttontoactionapp.presentation.Target
+import ua.rodev.buttontoactionapp.presentation.action.BaseActionViewModelTest
 
-class MainActionViewModelTest {
+class MainActionViewModelTest : BaseActionViewModelTest() {
 
     private lateinit var viewModel: MainActionViewModel
     private lateinit var dispatchers: FakeCoroutineDispatchers
@@ -106,64 +97,5 @@ class MainActionViewModelTest {
             ActionResult.Failure("no available actions"),
             interactor.action(System.currentTimeMillis())
         )
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private class FakeCoroutineDispatchers(
-        private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
-    ) : CoroutineDispatchers {
-
-        init {
-            Dispatchers.setMain(dispatcher)
-        }
-
-        override fun io(): CoroutineDispatcher = dispatcher
-        override fun main(): CoroutineDispatcher = dispatcher
-    }
-
-    private class FakeActionInteractor : ActionInteractor {
-
-        private var actionResult: ActionResult = ActionResult.Success(ActionType.Call)
-
-        fun changeExpectedResult(source: ActionResult) {
-            actionResult = source
-        }
-
-        override suspend fun action(currentTimeMills: Long): ActionResult = actionResult
-    }
-
-    private class FakeActionTarget : Target.Mutable<ActionType> {
-
-        var count = 0
-        lateinit var target: ActionType
-
-        override suspend fun map(source: ActionType) {
-            target = source
-            count++
-        }
-
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) = Unit
-    }
-
-    private class FakeProgressTarget : Target.Mutable<Int> {
-
-        val progressCalledList = mutableListOf<Int>()
-
-        override suspend fun map(source: Int) {
-            progressCalledList.add(source)
-        }
-
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<Int>) = Unit
-    }
-
-    private class FakeSnackbarTarget : Target.Mutable<String> {
-
-        var snankbarShown = 0
-
-        override suspend fun map(source: String) {
-            snankbarShown++
-        }
-
-        override fun collect(owner: LifecycleOwner, collector: FlowCollector<String>) = Unit
     }
 }
