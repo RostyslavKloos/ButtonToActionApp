@@ -1,4 +1,4 @@
-package ua.rodev.buttontoactionapp.presentation.action
+package ua.rodev.buttontoactionapp.presentation.action.withNavigation
 
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType

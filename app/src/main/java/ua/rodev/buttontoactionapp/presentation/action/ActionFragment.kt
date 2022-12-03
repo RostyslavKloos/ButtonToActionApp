@@ -56,8 +56,8 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
         viewModel.collectProgress(viewLifecycleOwner) {
             with(binding) {
-                progressBar.isVisible = it
-                btnAction.isVisible = !it
+                progressBar.visibility = it
+                btnAction.isVisible = it != View.VISIBLE
             }
         }
 

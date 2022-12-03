@@ -1,5 +1,6 @@
 package ua.rodev.buttontoactionapp.presentation
 
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.channels.Channel
@@ -57,5 +58,5 @@ interface Target {
 
     class ActionSnackbarTarget : SingleUi<String>()
 
-    class ProgressTarget : AbstractStateFlow<Boolean>(false)
+    class ProgressTarget : AbstractStateFlow<Int>(View.GONE)
 }

@@ -24,7 +24,7 @@ interface ActionInteractor {
                     .filter {
                         it.isEnabled()
                                 && it.checkValidDays(checkValidDays)
-                                && !it.cantBeChosen(isOnline)
+                                && !(it.isToastAction() && !isOnline)
                     }
                     .filter {
                         val lastTimeUsage = it.findInMapByType(coolDownMap)
@@ -36,7 +36,7 @@ interface ActionInteractor {
                 availableActions.forEach { action ->
                     if (action.higherPriorityThan(priorityAction)) priorityAction = action
                 }
-                usageHistory.save(priorityAction.updateTimeUsage(coolDownMap, currentTimeMills))
+                usageHistory.save(priorityAction.updatedTimeUsage(coolDownMap, currentTimeMills))
                 return priorityAction.map(mapper)
             } catch (e: DomainException) {
                 return ActionResult.Failure(handleError.handle(e))

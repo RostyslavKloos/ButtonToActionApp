@@ -1,10 +1,10 @@
-package ua.rodev.buttontoactionapp.presentation.action
+package ua.rodev.buttontoactionapp.presentation.action.main
 
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.Target
 
-class ActionResultMapper(
+class MainActionResultMapper(
     private val actionTarget: Target.Mutable<ActionType>,
     private val snackbarTarget: Target.Mutable<String>,
 ) : ActionResult.ActionResultMapper<Unit> {

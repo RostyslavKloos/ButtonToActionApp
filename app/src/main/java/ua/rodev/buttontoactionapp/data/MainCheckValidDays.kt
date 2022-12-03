@@ -11,7 +11,7 @@ class MainCheckValidDays : CheckValidDays {
         val weekDays = DayOfWeek.values()
 
         days.forEach {
-            if (it in 0..7) {
+            if (it in weekDays.first().value..weekDays.last().value) {
                 if (currentDay == weekDays[it]) {
                     valid = true
                     return@forEach

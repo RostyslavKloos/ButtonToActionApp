@@ -12,6 +12,12 @@ import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Target
 import ua.rodev.buttontoactionapp.presentation.action.*
+import ua.rodev.buttontoactionapp.presentation.action.main.MainActionResultMapper
+import ua.rodev.buttontoactionapp.presentation.action.main.MainActionModule
+import ua.rodev.buttontoactionapp.presentation.action.main.MainActionViewModel
+import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionResultNavigationMapper
+import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionWithNavigationModule
+import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionWithNavigationViewModel
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -42,7 +48,7 @@ object ActionModule {
     @Provides
     @Singleton
     @ActionProgressTarget
-    fun provideProgressTarget(): Target.Mutable<Boolean> = Target.ProgressTarget()
+    fun provideProgressTarget(): Target.Mutable<Int> = Target.ProgressTarget()
 
     @Provides
     @Singleton
@@ -60,7 +66,7 @@ object ActionModule {
     fun provideActionResultIntentTypeMapper(
         actionFlow: Target.Mutable<ActionType>,
         @ActionSnackbar snackbarTarget: Target.Mutable<String>,
-    ): ActionResult.ActionResultMapper<Unit> = ActionResultMapper(actionFlow, snackbarTarget)
+    ): ActionResult.ActionResultMapper<Unit> = MainActionResultMapper(actionFlow, snackbarTarget)
 
     @Provides
     @ContactTypeMapper
@@ -76,10 +82,10 @@ object ActionModule {
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Target.Mutable<ActionType>,
-        @ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
+        @ActionProgressTarget progressFlow: Target.Mutable<Int>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
         @ActionSnackbar snackbarTarget: Target.Mutable<String>,
-    ): ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel> =
+    ): ViewModelModule<ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
             dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
         )
@@ -89,16 +95,16 @@ object ActionModule {
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Target.Mutable<ActionType>,
-        @ActionProgressTarget progressFlow: Target.Mutable<Boolean>,
+        @ActionProgressTarget progressFlow: Target.Mutable<Int>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
         @ActionSnackbar snackbarTarget: Target.Mutable<String>,
-    ): ViewModelModule<BaseActionViewModel.MainActionViewModel> = MainActionModule(
+    ): ViewModelModule<MainActionViewModel> = MainActionModule(
         dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
     )
 
     @Provides
     fun provideDependencyContainer(
-        mainActionModule: ViewModelModule<BaseActionViewModel.MainActionViewModel>,
-        actionWithNavigationModule: ViewModelModule<BaseActionViewModel.ActionWithNavigationViewModel>,
+        mainActionModule: ViewModelModule<MainActionViewModel>,
+        actionWithNavigationModule: ViewModelModule<ActionWithNavigationViewModel>,
     ): DependencyContainer = DependencyContainer.Main(mainActionModule, actionWithNavigationModule)
 }

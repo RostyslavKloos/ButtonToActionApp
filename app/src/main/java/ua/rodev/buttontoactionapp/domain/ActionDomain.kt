@@ -15,11 +15,9 @@ data class ActionDomain(
 
     fun <T> map(mapper: Mapper<T>): T = mapper.map(type)
 
-    fun isEnabled() = enabled
+    fun isEnabled(): Boolean = enabled
 
-    fun cantBeChosen(internetAvailable: Boolean): Boolean {
-        return type is ActionType.Toast && !internetAvailable
-    }
+    fun isToastAction(): Boolean = type is ActionType.Toast
 
     fun checkValidDays(checkValidDays: CheckValidDays): Boolean = checkValidDays.isValid(validDays)
 
@@ -27,7 +25,7 @@ data class ActionDomain(
 
     fun findInMapByType(map: Map<String, Long>): Long? = map[type.value]
 
-    fun updateTimeUsage(map: Map<String, Long>, time: Long): Map<String, Long> {
+    fun updatedTimeUsage(map: Map<String, Long>, time: Long): Map<String, Long> {
         return map.toMutableMap().apply { this[type.value] = time }
     }
 
