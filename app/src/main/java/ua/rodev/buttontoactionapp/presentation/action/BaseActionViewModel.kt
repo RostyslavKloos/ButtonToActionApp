@@ -21,9 +21,9 @@ abstract class BaseActionViewModel(
     private val progressTarget: Target.Mutable<Int>,
     private val mapper: ActionResult.ActionResultMapper<Unit>,
     private val snackbarTarget: Target.Mutable<String>,
-) : ViewModel(), Target.Observe<ActionType> {
+) : ViewModel() {
 
-    override fun collect(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
+    fun collectActionType(owner: LifecycleOwner, collector: FlowCollector<ActionType>) {
         actionTarget.collect(owner, collector)
     }
 
@@ -45,5 +45,4 @@ abstract class BaseActionViewModel(
             progressTarget.map(View.GONE)
         }
     }
-
 }

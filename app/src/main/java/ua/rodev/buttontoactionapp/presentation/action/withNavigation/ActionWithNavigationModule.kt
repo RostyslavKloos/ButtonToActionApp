@@ -6,7 +6,6 @@ import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.Target
-import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionWithNavigationViewModel
 
 class ActionWithNavigationModule(
     private val dispatchers: CoroutineDispatchers,

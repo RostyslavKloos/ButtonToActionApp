@@ -24,9 +24,9 @@ class SettingsViewModel @Inject constructor(
 
     fun useContactsScreen(value: Boolean) = useContactsPreferences.save(value)
 
-    fun isComposeUsed() = useComposePreferences.read()
+    fun isComposeUsed(): Boolean = useComposePreferences.read()
 
-    fun isContactsScreenUsed() = useContactsPreferences.read()
+    fun isContactsScreenUsed(): Boolean = useContactsPreferences.read()
 
     fun recreateFragment() {
         viewModelScope.launch {

@@ -15,9 +15,9 @@ class ActionWithNavigationViewModel @Inject constructor(
     dispatchers: CoroutineDispatchers,
     interactor: ActionInteractor,
     actionTarget: Target.Mutable<ActionType>,
-    @ActionModule.ActionProgressTarget progressFlow: Target.Mutable<Int>,
+    @ActionModule.ProgressTarget progressFlow: Target.Mutable<Int>,
     @ActionModule.ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-    @ActionModule.ActionSnackbar snackbarTarget: Target.Mutable<String>,
+    @ActionModule.Snackbar snackbarTarget: Target.Mutable<String>,
 ) : BaseActionViewModel(
     dispatchers,
     interactor,

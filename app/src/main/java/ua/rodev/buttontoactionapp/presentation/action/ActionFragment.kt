@@ -28,11 +28,11 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
     private val binding by viewBinding(FragmentActionBinding::bind)
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var viewModel: BaseActionViewModel
+    private lateinit var observer: MyLifecycleObserver
 
     @Inject
     lateinit var dependencyContainer: DependencyContainer
-    lateinit var viewModel: BaseActionViewModel
-    lateinit var observer: MyLifecycleObserver
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,16 +42,25 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
         ).read()
         viewModel = ViewModelProvider(
             this@ActionFragment,
-            ViewModelsFactory(dependencyContainer, isContactsScreen)
+            ActionViewModelsFactory(dependencyContainer, isContactsScreen)
         )[BaseActionViewModel::class.java]
         observer = MyLifecycleObserver(requireActivity())
         lifecycle.addObserver(observer)
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
-            if (isGranted) showNotification()
+            if (isGranted)
+                showNotification()
             else
                 showToast(getString(R.string.notification_permission_denied))
+        }
+
+        binding.btnAction.setOnClickListener {
+            viewModel.performAction()
+        }
+
+        viewModel.collectActionType(viewLifecycleOwner) {
+            it.handle(this)
         }
 
         viewModel.collectProgress(viewLifecycleOwner) {
@@ -63,14 +72,6 @@ class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
         viewModel.collectSnackbar(viewLifecycleOwner) {
             Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
-        }
-
-        viewModel.collect(viewLifecycleOwner) {
-            it.handle(this)
-        }
-
-        binding.btnAction.setOnClickListener {
-            viewModel.performAction()
         }
     }
 

@@ -4,16 +4,16 @@ import android.content.Context
 import android.provider.ContactsContract
 import androidx.core.database.getStringOrNull
 
-interface LocalContactsManager {
+interface LocalContacts {
 
-    fun fetchLocalContacts(): List<ContactUi>
+    fun contacts(): List<ContactUi>
 
-    class Main(private val context: Context) : LocalContactsManager {
+    class Main(private val context: Context) : LocalContacts {
 
         private val sortOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
         private val queryUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
 
-        override fun fetchLocalContacts(): List<ContactUi> {
+        override fun contacts(): List<ContactUi> {
             val contacts = ArrayList<ContactUi>()
             val cursor = context.contentResolver?.query(
                 queryUri,
@@ -31,7 +31,7 @@ interface LocalContactsManager {
                 while (cursor.moveToNext()) {
                     val id = cursor.getString(idIndex)
                     val name = cursor.getString(nameIndex)
-                    val avatarUri = cursor.getStringOrNull(photoIndex)
+                    val avatarUri = cursor.getStringOrNull(photoIndex) ?: ""
                     addNewContactOrChangeExisting(id, name, avatarUri, contacts)
                 }
             }
@@ -42,7 +42,7 @@ interface LocalContactsManager {
         private fun addNewContactOrChangeExisting(
             id: String,
             name: String,
-            avatarUri: String?,
+            avatarUri: String,
             contacts: ArrayList<ContactUi>,
         ) {
             val contactId = id.toLong()

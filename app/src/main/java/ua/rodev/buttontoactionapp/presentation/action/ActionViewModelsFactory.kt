@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 @Suppress("UNCHECKED_CAST")
-class ViewModelsFactory(
+class ActionViewModelsFactory(
     private val dependencyContainer: DependencyContainer,
     private val isContactsScreen: Boolean,
 ) : ViewModelProvider.Factory {

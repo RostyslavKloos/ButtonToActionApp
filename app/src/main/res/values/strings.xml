@@ -11,4 +11,5 @@
     <string name="use_compose">Use compose</string>
     <string name="use_contacts_screen">Use contacts screen</string>
     <string name="action_is_toast">Action is Toast!</string>
+    <string name="action_is_notification">Action is Notification!</string>
 </resources>

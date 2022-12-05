@@ -9,10 +9,10 @@ class ContactUiMapper(
     private val avatar: ImageView,
 ) : ContactUi.Mapper<Unit> {
 
-    override fun map(id: String, avatarUri: String?) {
-        name.text = id
+    override fun map(name: String, avatarUri: String) {
+        this.name.text = name
         Glide
-            .with(name)
+            .with(this.name)
             .load(avatarUri)
             .centerCrop()
             .into(avatar)

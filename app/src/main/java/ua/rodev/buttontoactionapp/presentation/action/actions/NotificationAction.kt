@@ -14,7 +14,7 @@ import ua.rodev.buttontoactionapp.presentation.main.MainActivity
 
 class NotificationAction(
     private val context: Context,
-    private val title: String = "Action is Notification!",
+    private val title: String = context.getString(R.string.action_is_notification),
 ) : ActionUi {
     override fun perform() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

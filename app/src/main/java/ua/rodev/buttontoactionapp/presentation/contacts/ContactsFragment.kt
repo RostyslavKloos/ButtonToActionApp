@@ -6,30 +6,32 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.R
+import ua.rodev.buttontoactionapp.core.viewBinding
+import ua.rodev.buttontoactionapp.databinding.FragmentContactsBinding
 
 @AndroidEntryPoint
 class ContactsFragment : Fragment(R.layout.fragment_contacts) {
 
+    private val binding by viewBinding(FragmentContactsBinding::bind)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
-        val contactsManager = LocalContactsManager.Main(context)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val callMapper = ContactUiCallMapper(context)
         val adapter = ContactsAdapter(
             object : ClickListener {
                 override fun click(item: ContactUi) = item.call(callMapper)
             }
         )
-        recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
+        val localContacts by lazy { LocalContacts.Main(context) }
         val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
             if (isGranted) {
-                adapter.map(contactsManager.fetchLocalContacts())
+                adapter.map(localContacts.contacts())
             } else {
                 Toast.makeText(
                     context,

@@ -20,6 +20,9 @@ class MainViewModel @Inject constructor(
     private val settings: SettingsConfiguration.Mutable,
 ) : ViewModel(), Target.Observe<NavigationStrategy> {
 
+    override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) =
+        navigationTarget.collect(owner, collector)
+
     fun init() = viewModelScope.launch {
         replace(Screen.Action)
     }
@@ -28,8 +31,5 @@ class MainViewModel @Inject constructor(
         navigationTarget.map(NavigationStrategy.Replace(screen))
     }
 
-    fun isComposeUsed() = settings.read()
-
-    override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) =
-        navigationTarget.collect(owner, collector)
+    fun isComposeUsed(): Boolean = settings.read()
 }

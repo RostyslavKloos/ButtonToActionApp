@@ -37,16 +37,18 @@ class SettingsComposeFragment : Fragment() {
             var useComposeChecked by remember { mutableStateOf(viewModel.isComposeUsed()) }
             var useContactsScreen by remember { mutableStateOf(viewModel.isContactsScreenUsed()) }
 
-            Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp),
                     verticalAlignment = CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.use_compose)
-                    )
+                    Text(text = stringResource(R.string.use_compose))
                     Spacer(modifier = Modifier.width(4.dp))
                     Switch(
                         checked = useComposeChecked,
@@ -63,9 +65,7 @@ class SettingsComposeFragment : Fragment() {
                         .padding(start = 16.dp),
                     verticalAlignment = CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.use_contacts_screen)
-                    )
+                    Text(text = stringResource(R.string.use_contacts_screen))
                     Spacer(modifier = Modifier.width(4.dp))
                     Switch(
                         checked = useContactsScreen,

@@ -27,11 +27,11 @@ object ActionModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ActionProgressTarget
+    annotation class ProgressTarget
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ActionSnackbar
+    annotation class Snackbar
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
@@ -47,7 +47,7 @@ object ActionModule {
 
     @Provides
     @Singleton
-    @ActionProgressTarget
+    @ProgressTarget
     fun provideProgressTarget(): Target.Mutable<Int> = Target.ProgressTarget()
 
     @Provides
@@ -58,14 +58,14 @@ object ActionModule {
 
     @Provides
     @Singleton
-    @ActionSnackbar
+    @Snackbar
     fun provideActionSnackbar(): Target.Mutable<String> = Target.ActionSnackbarTarget()
 
     @Provides
     @IntentTypeMapper
     fun provideActionResultIntentTypeMapper(
         actionFlow: Target.Mutable<ActionType>,
-        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
+        @Snackbar snackbarTarget: Target.Mutable<String>,
     ): ActionResult.ActionResultMapper<Unit> = MainActionResultMapper(actionFlow, snackbarTarget)
 
     @Provides
@@ -73,7 +73,7 @@ object ActionModule {
     fun provideActionResultContactTypeMapper(
         navigationTarget: Target.Update<NavigationStrategy>,
         actionTarget: Target.Mutable<ActionType>,
-        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
+        @Snackbar snackbarTarget: Target.Mutable<String>,
     ): ActionResult.ActionResultMapper<Unit> =
         ActionResultNavigationMapper(navigationTarget, actionTarget, snackbarTarget)
 
@@ -82,9 +82,9 @@ object ActionModule {
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Target.Mutable<ActionType>,
-        @ActionProgressTarget progressFlow: Target.Mutable<Int>,
+        @ProgressTarget progressFlow: Target.Mutable<Int>,
         @ContactTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
+        @Snackbar snackbarTarget: Target.Mutable<String>,
     ): ViewModelModule<ActionWithNavigationViewModel> =
         ActionWithNavigationModule(
             dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
@@ -95,9 +95,9 @@ object ActionModule {
         dispatchers: CoroutineDispatchers,
         interactor: ActionInteractor,
         actionFlow: Target.Mutable<ActionType>,
-        @ActionProgressTarget progressFlow: Target.Mutable<Int>,
+        @ProgressTarget progressFlow: Target.Mutable<Int>,
         @IntentTypeMapper mapper: ActionResult.ActionResultMapper<Unit>,
-        @ActionSnackbar snackbarTarget: Target.Mutable<String>,
+        @Snackbar snackbarTarget: Target.Mutable<String>,
     ): ViewModelModule<MainActionViewModel> = MainActionModule(
         dispatchers, interactor, actionFlow, progressFlow, mapper, snackbarTarget
     )

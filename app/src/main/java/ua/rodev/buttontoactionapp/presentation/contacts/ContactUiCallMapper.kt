@@ -8,7 +8,8 @@ import android.provider.ContactsContract
 class ContactUiCallMapper(private val context: Context) : ContactUi.Call {
     override fun call(id: Long) {
         val intent = Intent(Intent.ACTION_VIEW)
-        val uri: Uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI,
+        val uri: Uri = Uri.withAppendedPath(
+            ContactsContract.Contacts.CONTENT_URI,
             id.toString()
         )
         intent.data = uri
