@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.R
@@ -25,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
