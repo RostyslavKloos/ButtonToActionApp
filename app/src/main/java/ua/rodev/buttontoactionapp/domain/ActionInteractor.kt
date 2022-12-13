@@ -11,7 +11,6 @@ interface ActionInteractor {
         private val handleError: HandleError<String>,
         private val checkValidDays: CheckValidDays,
         private val usageHistory: ActionsUsageTimeHistoryStorage.Mutable,
-        private val mapper: ActionDomain.Mapper<ActionResult>,
         private val networkMonitor: NetworkMonitor,
     ) : ActionInteractor {
 
@@ -37,7 +36,7 @@ interface ActionInteractor {
                     if (action.higherPriorityThan(priorityAction)) priorityAction = action
                 }
                 usageHistory.save(priorityAction.updatedUsageTime(coolDownMap, currentTimeMills))
-                return priorityAction.map(mapper)
+                return priorityAction.mapToSuccessResult()
             } catch (e: DomainException) {
                 return ActionResult.Failure(handleError.handle(e))
             }

@@ -4,12 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 @Suppress("UNCHECKED_CAST")
-class ActionViewModelsFactory(
+class ViewModelsFactory(
     private val dependencyContainer: DependencyContainer,
-    private val isContactsScreen: Boolean,
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return dependencyContainer.module(modelClass, isContactsScreen).viewModel() as T
+        return dependencyContainer.module(modelClass).viewModel() as T
     }
 }

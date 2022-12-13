@@ -42,7 +42,7 @@ class NumberViewHolder(
 
     private val name = itemView.findViewById<TextView>(R.id.tvName)
     private val avatar = itemView.findViewById<ImageView>(R.id.ivAvatar)
-    private val mapper = ContactUiMapper(name, avatar)
+    private val mapper = ContactUiItemMapper(name, avatar)
 
     fun bind(model: ContactUi) {
         model.map(mapper)
@@ -64,7 +64,7 @@ class DiffUtilCallback(
     override fun getNewListSize() = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        oldList[oldItemPosition].matches(newList[newItemPosition])
+        oldList[oldItemPosition].map(newList[newItemPosition])
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
         oldList[oldItemPosition] == newList[newItemPosition]

@@ -46,7 +46,7 @@ interface LocalContacts {
             contacts: ArrayList<ContactUi>,
         ) {
             val contactId = id.toLong()
-            val existingContact = contacts.firstOrNull { it.compare(contactId) }
+            val existingContact = contacts.firstOrNull { it.map(ContactUi.Mapper.Matches(contactId)) }
             if (existingContact == null) {
                 val contact = ContactUi(
                     id = contactId,

@@ -9,11 +9,7 @@ data class ActionDomain(
     private val coolDown: Long,
 ) {
 
-    interface Mapper<T> {
-        fun map(type: ActionType): T
-    }
-
-    fun <T> map(mapper: Mapper<T>): T = mapper.map(type)
+    fun mapToSuccessResult(): ActionResult.Success = ActionResult.Success(type)
 
     fun isEnabled(): Boolean = enabled
 
@@ -33,6 +29,4 @@ data class ActionDomain(
         return (currentTimeMillis - coolDown) < resultActionLastUsageTime
     }
 
-    fun mapToDomainException(): DomainException.ActionOnCoolDown =
-        DomainException.ActionOnCoolDown(type.value)
 }

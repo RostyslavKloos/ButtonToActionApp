@@ -1,7 +1,9 @@
 package ua.rodev.buttontoactionapp.domain
 
 import android.os.Parcelable
+import androidx.annotation.StringRes
 import kotlinx.parcelize.Parcelize
+import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.presentation.action.HandleAction
 
 // TODO: make value private 
@@ -14,8 +16,10 @@ sealed class ActionType(val value: String) : Parcelable {
         override fun handle(actionUi: HandleAction) = actionUi.showAnimation()
     }
 
-    data class Toast(private val message: String) : ActionType("toast") {
-        override fun handle(actionUi: HandleAction) = actionUi.showToast(message)
+    data class Toast(
+        @StringRes private val messageId: Int = R.string.action_is_toast,
+    ) : ActionType("toast") {
+        override fun handle(actionUi: HandleAction) = actionUi.showToast(messageId)
     }
 
     object Notification : ActionType("notification") {
@@ -26,7 +30,7 @@ sealed class ActionType(val value: String) : Parcelable {
         override fun handle(actionUi: HandleAction) = actionUi.call()
     }
 
-    object None: ActionType("") {
+    object None : ActionType("") {
         override fun handle(actionUi: HandleAction) = Unit
     }
 }

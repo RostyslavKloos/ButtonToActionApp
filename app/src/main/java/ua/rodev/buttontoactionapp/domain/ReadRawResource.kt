@@ -8,7 +8,10 @@ interface ReadRawResource {
     fun read(@RawRes id: Int): String
 
     class Main(private val context: Context) : ReadRawResource {
-        override fun read(id: Int) =
-            context.resources.openRawResource(id).bufferedReader().readText()
+        override fun read(id: Int): String {
+            return context.resources.openRawResource(id).use {
+                it.bufferedReader().readText()
+            }
+        }
     }
 }

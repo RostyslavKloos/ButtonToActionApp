@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.NetworkMonitor
 import ua.rodev.buttontoactionapp.data.MainCheckValidDays
 import ua.rodev.buttontoactionapp.domain.*
-import ua.rodev.buttontoactionapp.presentation.ActionDomainToActionResultMapper
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -26,7 +25,6 @@ object DomainModule {
         handleError,
         MainCheckValidDays(),
         usageHistory,
-        ActionDomainToActionResultMapper(),
         networkMonitor
     )
 }

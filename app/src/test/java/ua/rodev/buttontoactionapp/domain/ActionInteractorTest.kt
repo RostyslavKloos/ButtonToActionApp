@@ -1,6 +1,5 @@
 package ua.rodev.buttontoactionapp.domain
 
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -11,12 +10,7 @@ import org.junit.Test
 import ua.rodev.buttontoactionapp.core.ManageResources
 import ua.rodev.buttontoactionapp.core.NetworkMonitor
 import ua.rodev.buttontoactionapp.data.MainCheckValidDays
-import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
-import ua.rodev.buttontoactionapp.data.cloud.ActionCloudToDomainMapper
-import ua.rodev.buttontoactionapp.data.cloud.CloudActionsList
-import ua.rodev.buttontoactionapp.presentation.ActionDomainToActionResultMapper
 import ua.rodev.buttontoactionapp.presentation.HandleUiError
-import java.io.File
 import java.time.LocalDate
 
 class ActionInteractorTest {
@@ -31,7 +25,7 @@ class ActionInteractorTest {
     @Before
     fun setUp() {
         manageResources = FakeManageResources()
-        repository = FakeRepository(ActionCloudToDomainMapper(manageResources))
+        repository = FakeRepository()
         handleError = HandleUiError(manageResources)
         usageHistory = FakeUsageHistory()
         networkMonitor = FakeNetworkMonitor()
@@ -40,7 +34,6 @@ class ActionInteractorTest {
             handleError,
             MainCheckValidDays(),
             usageHistory,
-            ActionDomainToActionResultMapper(),
             networkMonitor
         )
     }
@@ -107,13 +100,13 @@ class ActionInteractorTest {
         val currentDay = LocalDate.now().dayOfWeek
         val action = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3_600)
         repository.changeExpectedList(listOf(action))
-        manageResources.changeExpected("${action.mapToDomainException().action} action on coolDown")
+        manageResources.changeExpected("no available actions")
 
         interactor.action(DateTimeUtils.currentTimeMillis())
         DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis() + 3_000)
 
         val actual = interactor.action(DateTimeUtils.currentTimeMillis())
-        val expected = ActionResult.Failure("call action on coolDown")
+        val expected = ActionResult.Failure("no available actions")
         assertEquals(expected, actual)
     }
     //endregion
@@ -121,7 +114,7 @@ class ActionInteractorTest {
     @Test
     fun `Fetch toast action fail if there is no internet connection`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action = ActionDomain(ActionType.Toast(""), true, 1, listOf(currentDay.ordinal), 0)
+        val action = ActionDomain(ActionType.Toast(), true, 1, listOf(currentDay.ordinal), 0)
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("No available actions")
         networkMonitor.changeConnection(false)
@@ -132,13 +125,13 @@ class ActionInteractorTest {
         networkMonitor.changeConnection(true)
 
         val secondCall = interactor.action(System.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), secondCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), secondCall)
     }
 
     @Test
     fun `Fetch lower priority action between toast and another if there is no internet connection`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val toastAction = ActionDomain(ActionType.Toast(""), true, 10, listOf(currentDay.ordinal), 0)
+        val toastAction = ActionDomain(ActionType.Toast(), true, 10, listOf(currentDay.ordinal), 0)
         val otherAction = ActionDomain(ActionType.Notification, true, 1, listOf(currentDay.ordinal), 0)
         repository.changeExpectedList(listOf(toastAction, otherAction))
         networkMonitor.changeConnection(false)
@@ -149,7 +142,7 @@ class ActionInteractorTest {
         networkMonitor.changeConnection(true)
 
         val secondCall = interactor.action(System.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), secondCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), secondCall)
     }
 
     @Test
@@ -174,23 +167,23 @@ class ActionInteractorTest {
     @Test
     fun `Fetch action success after coolDown period was finished`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action = ActionDomain(ActionType.Toast(""), true, 1, listOf(currentDay.ordinal), 7_200)
+        val action = ActionDomain(ActionType.Toast(), true, 1, listOf(currentDay.ordinal), 7_200)
         usageHistory.clear()
-        usageHistory.actionKey = ActionType.Toast("").value
+        usageHistory.actionKey = ActionType.Toast().value
         repository.changeExpectedList(listOf(action))
-        manageResources.changeExpected("${action.mapToDomainException().action} action on coolDown")
+        manageResources.changeExpected("no available actions")
 
         val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), firstCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
         val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Failure("toast action on coolDown"), secondCall)
+        assertEquals(ActionResult.Failure("no available actions"), secondCall)
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
         val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), thirdCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), thirdCall)
 
         assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
@@ -206,15 +199,15 @@ class ActionInteractorTest {
     @Test
     fun `Fetching several actions with different priority`() = runBlocking {
         val currentDay = LocalDate.now().dayOfWeek
-        val action1 = ActionDomain(ActionType.Toast(""), true, 10, listOf(currentDay.ordinal), 7_200)
+        val action1 = ActionDomain(ActionType.Toast(), true, 10, listOf(currentDay.ordinal), 7_200)
         val action2 = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3000)
         usageHistory.clear()
-        usageHistory.actionKey = ActionType.Toast("").value
+        usageHistory.actionKey = ActionType.Toast().value
         repository.changeExpectedList(listOf(action1, action2))
-        manageResources.changeExpected("${action1.mapToDomainException().action} action on coolDown")
+        manageResources.changeExpected("no available actions")
 
         val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), firstCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
@@ -224,7 +217,7 @@ class ActionInteractorTest {
 
         DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
         val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
-        assertEquals(ActionResult.Success(ActionType.Toast("")), thirdCall)
+        assertEquals(ActionResult.Success(ActionType.Toast()), thirdCall)
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
 
@@ -240,11 +233,7 @@ class ActionInteractorTest {
         override fun string(id: Int, arg: String): String = value
     }
 
-    private class FakeRepository(
-        private val mapper: ActionCloud.Mapper<ActionDomain>,
-        private val path: String = "/mock.json",
-        private val gson: Gson = Gson(),
-    ) : ActionRepository {
+    private class FakeRepository : ActionRepository {
 
         private val actions = mutableListOf<ActionDomain>()
         var fetchActionsCalledCount = 0
@@ -253,13 +242,6 @@ class ActionInteractorTest {
         fun changeExpectedList(list: List<ActionDomain>) {
             actions.clear()
             actions.addAll(list)
-        }
-
-        fun initMockedList(): List<ActionDomain> {
-            val resource = javaClass.getResource(path) ?: return emptyList()
-            val file = File(resource.path).readText()
-            val fromJson = gson.fromJson(file, CloudActionsList::class.java)
-            return fromJson.map { it.map(mapper) }
         }
 
         override suspend fun fetchActions(): List<ActionDomain> {

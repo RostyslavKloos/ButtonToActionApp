@@ -4,17 +4,17 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 import ua.rodev.buttontoactionapp.core.Read
 import ua.rodev.buttontoactionapp.core.Save
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
 import ua.rodev.buttontoactionapp.data.cache.SettingsPreferences
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 @Module
 object SettingsModule {
 
@@ -31,14 +31,14 @@ object SettingsModule {
     annotation class UseContactsScreenPreferences
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     @SettingsPreferences
     fun provideSettingsPreferences(
         @ApplicationContext context: Context,
     ): PreferenceDataStore<Boolean> = SettingsPreferences(context)
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     @UseComposePreferences
     fun provideUseComposePreferences(
         @SettingsPreferences preferences: PreferenceDataStore<Boolean>,
@@ -46,7 +46,7 @@ object SettingsModule {
         SettingsConfiguration.UseComposePreferencesWrapper(preferences)
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     @UseContactsScreenPreferences
     fun provideUseContactsScreenPreferences(
         @SettingsPreferences preferences: PreferenceDataStore<Boolean>,
@@ -54,14 +54,14 @@ object SettingsModule {
         SettingsConfiguration.UseContactsScreenPreferencesWrapper(preferences)
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     @UseContactsScreenPreferences
     fun provideActionScreenTypeConfigurationRead(
         @UseContactsScreenPreferences preferences: SettingsConfiguration.Mutable,
     ): Read<Boolean> = preferences
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     @UseContactsScreenPreferences
     fun provideActionScreenTypeConfigurationSave(
         @UseContactsScreenPreferences preferences: SettingsConfiguration.Mutable,

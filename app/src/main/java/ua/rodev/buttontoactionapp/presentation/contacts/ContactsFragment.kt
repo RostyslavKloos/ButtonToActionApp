@@ -22,7 +22,7 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
         val callMapper = ContactUiCallMapper(context)
         val adapter = ContactsAdapter(
             object : ClickListener {
-                override fun click(item: ContactUi) = item.call(callMapper)
+                override fun click(item: ContactUi) = item.map(callMapper)
             }
         )
         binding.recyclerView.adapter = adapter

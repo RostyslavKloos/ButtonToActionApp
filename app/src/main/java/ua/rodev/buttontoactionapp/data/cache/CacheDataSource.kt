@@ -36,11 +36,11 @@ interface CacheDataSource : FetchActions {
         @Throws(IOException::class)
         override suspend fun fetchActions(): List<ActionCloud> {
             val file = File(directory, CHILD)
-            val fileReader = FileReader(file)
-            val bufferedReader = BufferedReader(fileReader)
-            val data = bufferedReader.readLine()
-            bufferedReader.close()
-            return gson.fromJson(data, CloudActionsList::class.java)
+            FileReader(file).use { fileReader ->
+                BufferedReader(fileReader).use { bufferedReader ->
+                    return gson.fromJson(bufferedReader.readLine(), CloudActionsList::class.java)
+                }
+            }
         }
 
         companion object {

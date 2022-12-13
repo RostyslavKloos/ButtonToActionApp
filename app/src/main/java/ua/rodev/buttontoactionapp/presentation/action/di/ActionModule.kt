@@ -6,18 +6,20 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.core.ViewModelModule
+import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Target
-import ua.rodev.buttontoactionapp.presentation.action.*
-import ua.rodev.buttontoactionapp.presentation.action.main.MainActionResultMapper
+import ua.rodev.buttontoactionapp.presentation.action.DependencyContainer
 import ua.rodev.buttontoactionapp.presentation.action.main.MainActionModule
+import ua.rodev.buttontoactionapp.presentation.action.main.MainActionResultMapper
 import ua.rodev.buttontoactionapp.presentation.action.main.MainActionViewModel
 import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionResultNavigationMapper
 import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionWithNavigationModule
 import ua.rodev.buttontoactionapp.presentation.action.withNavigation.ActionWithNavigationViewModel
+import ua.rodev.buttontoactionapp.presentation.settings.di.SettingsModule
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -106,5 +108,11 @@ object ActionModule {
     fun provideDependencyContainer(
         mainActionModule: ViewModelModule<MainActionViewModel>,
         actionWithNavigationModule: ViewModelModule<ActionWithNavigationViewModel>,
-    ): DependencyContainer = DependencyContainer.Main(mainActionModule, actionWithNavigationModule)
+        @SettingsModule.UseContactsScreenPreferences
+        useContactsScreenPreferences: SettingsConfiguration.Mutable,
+    ): DependencyContainer = DependencyContainer.Main(
+        mainActionModule,
+        actionWithNavigationModule,
+        useContactsScreenPreferences
+    )
 }

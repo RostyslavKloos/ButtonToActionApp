@@ -4,12 +4,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 
-class ContactUiMapper(
+class ContactUiItemMapper(
     private val name: TextView,
     private val avatar: ImageView,
 ) : ContactUi.Mapper<Unit> {
 
-    override fun map(name: String, avatarUri: String) {
+    override fun map(id: Long, name: String, avatarUri: String) {
         this.name.text = name
         Glide
             .with(this.name)

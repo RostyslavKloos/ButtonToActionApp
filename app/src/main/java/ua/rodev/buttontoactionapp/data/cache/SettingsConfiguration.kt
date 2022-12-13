@@ -1,8 +1,8 @@
 package ua.rodev.buttontoactionapp.data.cache
 
+import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 import ua.rodev.buttontoactionapp.core.Read
 import ua.rodev.buttontoactionapp.core.Save
-import ua.rodev.buttontoactionapp.core.PreferenceDataStore
 
 interface SettingsConfiguration {
 

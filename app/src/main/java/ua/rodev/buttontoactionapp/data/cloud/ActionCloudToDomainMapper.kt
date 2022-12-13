@@ -1,14 +1,10 @@
 package ua.rodev.buttontoactionapp.data.cloud
 
-import ua.rodev.buttontoactionapp.R
-import ua.rodev.buttontoactionapp.core.ManageResources
 import ua.rodev.buttontoactionapp.domain.ActionDomain
 import ua.rodev.buttontoactionapp.domain.ActionType
 import ua.rodev.buttontoactionapp.domain.DomainException
 
-class ActionCloudToDomainMapper(
-    private val resources: ManageResources
-) : ActionCloud.Mapper<ActionDomain> {
+class ActionCloudToDomainMapper : ActionCloud.Mapper<ActionDomain> {
     @Throws(DomainException::class)
     override fun map(
         type: String,
@@ -17,7 +13,7 @@ class ActionCloudToDomainMapper(
         validDays: List<Int>,
         coolDown: Long,
     ): ActionDomain {
-        val toastAction = ActionType.Toast(resources.string(R.string.action_is_toast))
+        val toastAction = ActionType.Toast()
         val actionType = when (type) {
             toastAction.value -> toastAction
             ActionType.Notification.value -> ActionType.Notification

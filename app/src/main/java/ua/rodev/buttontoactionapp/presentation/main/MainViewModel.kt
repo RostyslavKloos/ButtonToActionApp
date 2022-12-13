@@ -17,7 +17,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val navigationTarget: Target.Mutable<NavigationStrategy>,
     @SettingsModule.UseComposePreferences
-    private val settings: SettingsConfiguration.Mutable,
+    private val useComposeSettings: SettingsConfiguration.Mutable,
 ) : ViewModel(), Target.Observe<NavigationStrategy> {
 
     override fun collect(owner: LifecycleOwner, collector: FlowCollector<NavigationStrategy>) =
@@ -31,5 +31,8 @@ class MainViewModel @Inject constructor(
         navigationTarget.map(NavigationStrategy.Replace(screen))
     }
 
-    fun isComposeUsed(): Boolean = settings.read()
+    fun goSettings() {
+        val screen = if (useComposeSettings.read()) Screen.SettingsCompose else Screen.Settings
+        replace(screen)
+    }
 }

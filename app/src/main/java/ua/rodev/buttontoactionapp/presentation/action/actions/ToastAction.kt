@@ -2,13 +2,14 @@ package ua.rodev.buttontoactionapp.presentation.action.actions
 
 import android.content.Context
 import android.widget.Toast
+import androidx.annotation.StringRes
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.presentation.action.ActionUi
-import javax.inject.Inject
 
-class ToastAction @Inject constructor(
+class ToastAction(
     private val context: Context,
-    private val message: String = context.getString(R.string.action_is_toast),
+    @StringRes private val messageId: Int = R.string.action_is_toast,
 ) : ActionUi {
-    override fun perform() = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    override fun perform() =
+        Toast.makeText(context, context.getText(messageId), Toast.LENGTH_SHORT).show()
 }

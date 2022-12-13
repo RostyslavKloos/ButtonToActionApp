@@ -31,7 +31,7 @@ class MainActionRepositoryTest {
         repository = MainActionRepository(
             cloudDataSource = cloudDataSource,
             cacheDataSource = cacheDataSource,
-            mapper = ActionCloudToDomainMapper(manageResources),
+            mapper = ActionCloudToDomainMapper(),
             handleError = HandleDomainError()
         )
     }
@@ -42,7 +42,7 @@ class MainActionRepositoryTest {
         cloudDataSource.replaceData(listOf(ActionCloud("toast", true, 1, emptyList(), 0)))
         cacheDataSource.saveActions(listOf())
 
-        val expected = listOf(ActionDomain(ActionType.Toast(""), true, 1, emptyList(), 0))
+        val expected = listOf(ActionDomain(ActionType.Toast(), true, 1, emptyList(), 0))
         val actual = repository.fetchActions()
 
         assertEquals(expected, actual)
@@ -64,7 +64,7 @@ class MainActionRepositoryTest {
         val action = ActionCloud("toast", true, 1, listOf(), 0)
         cacheDataSource.saveActions(listOf(action))
 
-        val expected = listOf(ActionDomain(ActionType.Toast(""), true, 1, listOf(), 0))
+        val expected = listOf(ActionDomain(ActionType.Toast(), true, 1, listOf(), 0))
         val actual = repository.fetchActions()
 
         assertEquals(expected, actual)
@@ -122,11 +122,7 @@ class MainActionRepositoryTest {
 
     private class FakeManageResources : ManageResources {
 
-        private var value = ""
-
-        fun changeExpected(source: String) {
-            value = source
-        }
+        var value = ""
 
         override fun string(id: Int): String = value
         override fun string(id: Int, arg: String): String = value

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.joda.time.DateTimeUtils
+import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
 import ua.rodev.buttontoactionapp.domain.ActionResult
@@ -33,6 +34,16 @@ abstract class BaseActionViewModel(
 
     fun collectSnackbar(owner: LifecycleOwner, collector: FlowCollector<String>) {
         snackbarTarget.collect(owner, collector)
+    }
+
+    fun obtainNotificationPermissionRequest(isGranted: Boolean) {
+        val actionType = if (isGranted)
+            ActionType.Notification
+        else
+            ActionType.Toast(R.string.notification_permission_denied)
+        viewModelScope.launch {
+            actionTarget.map(actionType)
+        }
     }
 
     fun performAction() {
