@@ -7,11 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ua.rodev.buttontoactionapp.data.cache.ActionsTimeHistoryPreferences
-import ua.rodev.buttontoactionapp.domain.ActionsTimeUsageHistoryStorage
-import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
-import ua.rodev.buttontoactionapp.data.cache.MainActionsTimeUsageHistoryStorage
 import ua.rodev.buttontoactionapp.core.PreferenceDataStore
+import ua.rodev.buttontoactionapp.data.cache.ActionsTimeHistoryPreferences
+import ua.rodev.buttontoactionapp.data.cache.CacheDataSource
+import ua.rodev.buttontoactionapp.data.cache.MainActionsUsageTimeHistoryStorage
+import ua.rodev.buttontoactionapp.domain.ActionsUsageTimeHistoryStorage
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -21,7 +21,7 @@ object CacheModule {
 
     @Retention(AnnotationRetention.BINARY)
     @Qualifier
-    annotation class ActionsTimeUsageHistoryStorageQualifier
+    annotation class ActionsUsageTimeHistoryStorageQualifier
 
     @Provides
     @Singleton
@@ -31,7 +31,7 @@ object CacheModule {
 
     @Provides
     @Singleton
-    @ActionsTimeUsageHistoryStorageQualifier
+    @ActionsUsageTimeHistoryStorageQualifier
     fun provideActionsTimeHistoryUsageStore(
         @ApplicationContext context: Context,
     ): PreferenceDataStore<Map<String, Long>> {
@@ -39,8 +39,8 @@ object CacheModule {
     }
 
     @Provides
-    fun provideActionsTimeUsageHistoryStorage(
-        @ActionsTimeUsageHistoryStorageQualifier preferences: PreferenceDataStore<Map<String, Long>>,
-    ): ActionsTimeUsageHistoryStorage.Mutable = MainActionsTimeUsageHistoryStorage(preferences)
+    fun provideActionsUsageTimeHistoryStorage(
+        @ActionsUsageTimeHistoryStorageQualifier preferences: PreferenceDataStore<Map<String, Long>>,
+    ): ActionsUsageTimeHistoryStorage.Mutable = MainActionsUsageTimeHistoryStorage(preferences)
 
 }

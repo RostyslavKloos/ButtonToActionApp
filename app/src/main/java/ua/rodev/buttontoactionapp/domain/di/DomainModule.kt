@@ -19,7 +19,7 @@ object DomainModule {
     fun provideActionInteractor(
         repository: ActionRepository,
         handleError: HandleError<String>,
-        usageHistory: ActionsTimeUsageHistoryStorage.Mutable,
+        usageHistory: ActionsUsageTimeHistoryStorage.Mutable,
         networkMonitor: NetworkMonitor
     ): ActionInteractor = ActionInteractor.Main(
         repository,

@@ -23,9 +23,9 @@ data class ActionDomain(
 
     fun higherPriorityThan(source: ActionDomain): Boolean = this.priority > source.priority
 
-    fun findInMapByType(map: Map<String, Long>): Long? = map[type.value]
+    fun lastUsageTime(map: Map<String, Long>): Long? = map[type.value]
 
-    fun updatedTimeUsage(map: Map<String, Long>, time: Long): Map<String, Long> {
+    fun updatedUsageTime(map: Map<String, Long>, time: Long): Map<String, Long> {
         return map.toMutableMap().apply { this[type.value] = time }
     }
 

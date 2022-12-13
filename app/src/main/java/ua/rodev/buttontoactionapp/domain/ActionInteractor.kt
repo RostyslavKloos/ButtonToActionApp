@@ -10,7 +10,7 @@ interface ActionInteractor {
         private val repository: ActionRepository,
         private val handleError: HandleError<String>,
         private val checkValidDays: CheckValidDays,
-        private val usageHistory: ActionsTimeUsageHistoryStorage.Mutable,
+        private val usageHistory: ActionsUsageTimeHistoryStorage.Mutable,
         private val mapper: ActionDomain.Mapper<ActionResult>,
         private val networkMonitor: NetworkMonitor,
     ) : ActionInteractor {
@@ -27,8 +27,8 @@ interface ActionInteractor {
                                 && !(it.isToastAction() && !isOnline)
                     }
                     .filter {
-                        val lastTimeUsage = it.findInMapByType(coolDownMap)
-                        lastTimeUsage == null || !it.onCoolDown(currentTimeMills, lastTimeUsage)
+                        val lastUsageTime = it.lastUsageTime(coolDownMap)
+                        lastUsageTime == null || !it.onCoolDown(currentTimeMills, lastUsageTime)
                     }
                 if (availableActions.isEmpty())
                     return ActionResult.Failure(handleError.handle(DomainException.NoAvailableActions))
@@ -36,7 +36,7 @@ interface ActionInteractor {
                 availableActions.forEach { action ->
                     if (action.higherPriorityThan(priorityAction)) priorityAction = action
                 }
-                usageHistory.save(priorityAction.updatedTimeUsage(coolDownMap, currentTimeMills))
+                usageHistory.save(priorityAction.updatedUsageTime(coolDownMap, currentTimeMills))
                 return priorityAction.map(mapper)
             } catch (e: DomainException) {
                 return ActionResult.Failure(handleError.handle(e))

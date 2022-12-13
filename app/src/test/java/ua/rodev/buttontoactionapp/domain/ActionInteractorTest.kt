@@ -269,7 +269,7 @@ class ActionInteractorTest {
         }
     }
 
-    private class FakeUsageHistory : ActionsTimeUsageHistoryStorage.Mutable {
+    private class FakeUsageHistory : ActionsUsageTimeHistoryStorage.Mutable {
 
         private val coolDownMap: MutableMap<String, Long> = mutableMapOf()
         val coolDownHistory = mutableListOf<Long>()
