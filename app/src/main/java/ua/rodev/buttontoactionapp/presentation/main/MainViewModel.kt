@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
+import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.data.cache.SettingsConfiguration
 import ua.rodev.buttontoactionapp.presentation.NavigationStrategy
 import ua.rodev.buttontoactionapp.presentation.Screen
@@ -24,15 +25,19 @@ class MainViewModel @Inject constructor(
         navigationTarget.collect(owner, collector)
 
     fun init() = viewModelScope.launch {
-        replace(Screen.Action)
+        navigationTarget.map(NavigationStrategy.Replace(Screen.Action))
     }
 
-    fun replace(screen: Screen) = viewModelScope.launch {
-        navigationTarget.map(NavigationStrategy.Replace(screen))
-    }
-
-    fun goSettings() {
-        val screen = if (useComposeSettings.read()) Screen.SettingsCompose else Screen.Settings
-        replace(screen)
+    fun navigateTo(itemId: Int): Boolean {
+        viewModelScope.launch {
+            val screen = when (itemId) {
+                R.id.settings -> {
+                    if (useComposeSettings.read()) Screen.SettingsCompose else Screen.Settings
+                }
+                else -> Screen.Action
+            }
+            navigationTarget.map(NavigationStrategy.Replace(screen))
+        }
+        return true
     }
 }

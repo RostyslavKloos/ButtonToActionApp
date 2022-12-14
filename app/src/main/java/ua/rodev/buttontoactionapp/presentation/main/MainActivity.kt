@@ -10,7 +10,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import ua.rodev.buttontoactionapp.ProvideViewModel
 import ua.rodev.buttontoactionapp.R
-import ua.rodev.buttontoactionapp.presentation.Screen
 import ua.rodev.buttontoactionapp.presentation.action.actions.CallAction
 import ua.rodev.buttontoactionapp.presentation.action.actions.NotificationAction
 
@@ -25,11 +24,7 @@ class MainActivity : AppCompatActivity(), ProvideViewModel {
         setContentView(R.layout.activity_main)
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigation.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.actions -> viewModel.replace(Screen.Action)
-                R.id.settings -> viewModel.goSettings()
-            }
-            true
+            viewModel.navigateTo(it.itemId)
         }
 
         viewModel.collect(this) {

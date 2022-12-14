@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ua.rodev.buttontoactionapp.core.SuspendMapper
 import ua.rodev.buttontoactionapp.domain.ActionType
+import ua.rodev.buttontoactionapp.presentation.contacts.ContactUi
 
 interface Target {
 
@@ -56,7 +57,9 @@ interface Target {
 
     class NavigationTarget : SingleUi<NavigationStrategy>()
 
-    class ActionSnackbarTarget : SingleUi<String>()
+    class SnackbarTarget : SingleUi<String>()
 
     class ProgressTarget : AbstractStateFlow<Int>(View.GONE)
+
+    class LocalContactsTarget : AbstractStateFlow<List<ContactUi>>(emptyList())
 }

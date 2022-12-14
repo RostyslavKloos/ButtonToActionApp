@@ -59,9 +59,9 @@ object ActionModule {
     ): Target.Update<NavigationStrategy> = navigationTarget
 
     @Provides
-    @Singleton
     @Snackbar
-    fun provideActionSnackbar(): Target.Mutable<String> = Target.ActionSnackbarTarget()
+    @Singleton
+    fun provideActionSnackbar(): Target.Mutable<String> = Target.SnackbarTarget()
 
     @Provides
     @IntentTypeMapper
