@@ -2,7 +2,7 @@ package ua.rodev.buttontoactionapp.presentation.contacts
 
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
+import ua.rodev.buttontoactionapp.presentation.load
 
 class ContactUiItemMapper(
     private val name: TextView,
@@ -11,10 +11,6 @@ class ContactUiItemMapper(
 
     override fun map(id: Long, name: String, avatarUri: String) {
         this.name.text = name
-        Glide
-            .with(this.name)
-            .load(avatarUri)
-            .centerCrop()
-            .into(avatar)
+        avatar.load(avatarUri)
     }
 }

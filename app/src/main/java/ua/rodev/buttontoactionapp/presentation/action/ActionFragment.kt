@@ -23,26 +23,26 @@ import ua.rodev.buttontoactionapp.presentation.main.MyLifecycleObserver
 @AndroidEntryPoint
 class ActionFragment : Fragment(R.layout.fragment_action), HandleAction {
 
-    private val binding by viewBinding(FragmentActionBinding::bind)
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var viewModel: BaseActionViewModel
     private lateinit var observer: MyLifecycleObserver
+    private val binding by viewBinding(FragmentActionBinding::bind)
+    private val requestPermissionLauncher: ActivityResultLauncher<String> by lazy {
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            viewModel.obtainNotificationPermissionRequest(isGranted)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val requireActivity = requireActivity()
-        viewModel = (requireActivity as ProvideViewModel).provideViewModel(
-            clazz = BaseActionViewModel::class.java,
-            owner = this
-        )
+        viewModel = (requireActivity as ProvideViewModel)
+            .provideViewModel(BaseActionViewModel::class.java, this)
+
         observer = MyLifecycleObserver(requireActivity)
         lifecycle.addObserver(observer)
-        requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-           viewModel.obtainNotificationPermissionRequest(isGranted)
-        }
 
         binding.btnAction.setOnClickListener {
             viewModel.performAction()
