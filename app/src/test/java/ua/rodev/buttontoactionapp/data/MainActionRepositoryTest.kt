@@ -1,7 +1,6 @@
 package ua.rodev.buttontoactionapp.data
 
 import kotlinx.coroutines.runBlocking
-import okio.IOException
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -70,12 +69,10 @@ class MainActionRepositoryTest {
         assertEquals(expected, actual)
     }
 
-    @Test(expected = DomainException.ServiceUnavailable::class)
+    @Test(expected = DomainException.NoInternetConnection::class)
     fun `Fetch actions cached failure`() = runBlocking {
         cloudDataSource.changeConnection(false)
-        cacheDataSource.throwException = true
-        val action = ActionCloud("call", true, 1, listOf(), 0)
-        cacheDataSource.saveActions(listOf(action))
+        cacheDataSource.saveActions(emptyList())
 
         repository.fetchActions()
 
@@ -85,7 +82,6 @@ class MainActionRepositoryTest {
     private class FakeCacheDataSource : CacheDataSource {
 
         private val actions = mutableListOf<ActionCloud>()
-        var throwException = false
 
         override fun saveActions(actions: List<ActionCloud>) {
             this.actions.clear()
@@ -93,7 +89,6 @@ class MainActionRepositoryTest {
         }
 
         override suspend fun fetchActions(): List<ActionCloud> {
-            if (throwException) throw IOException()
             return actions
         }
     }

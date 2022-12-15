@@ -22,13 +22,9 @@ class MainActionRepository(
             cacheDataSource.saveActions(cloudData)
             cloudData.map { it.map(mapper) }
         } catch (e: Exception) {
-            try {
-                val cacheData = cacheDataSource.fetchActions()
-                if (cacheData.isEmpty()) throw handleError.handle(e)
-                cacheData.map { it.map(mapper) }
-            } catch (e: Exception) {
-                throw handleError.handle(e)
-            }
+            val cacheData = cacheDataSource.fetchActions()
+            if (cacheData.isEmpty()) throw handleError.handle(e)
+            cacheData.map { it.map(mapper) }
         }
     }
 }

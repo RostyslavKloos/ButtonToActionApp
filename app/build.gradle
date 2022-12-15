@@ -29,7 +29,7 @@ android {
         debug {
             minifyEnabled false
             buildConfigField "String", "BASE_URL", "\"https://s3-us-west-2.amazonaws.com/\""
-            buildConfigField("String", "BUILD_TYPE", "\"TEST\"")
+            buildConfigField("String", "BUILD_TYPE", "\"TEST_\"")
         }
     }
     compileOptions {

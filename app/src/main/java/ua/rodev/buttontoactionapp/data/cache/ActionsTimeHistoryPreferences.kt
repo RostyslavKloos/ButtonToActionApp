@@ -15,10 +15,10 @@ class ActionsTimeHistoryPreferences(
 
     @Suppress("UNCHECKED_CAST")
     override fun read(key: String): Map<String, Long> {
-        val json = preferences.getString(key, "") ?: ""
-        val map = gson.fromJson(json, Map::class.java) as? Map<String, Double>
-        val mapped = hashMapOf<String, Long>()
-        map?.toMutableMap()?.forEach {
+        val mapped = mutableMapOf<String, Long>()
+        val json = preferences.getString(key, "") ?: return mapped
+        val map = gson.fromJson(json, Map::class.java) as Map<String, Double>
+        map.forEach {
             mapped[it.key] = it.value.toLong()
         }
         return mapped

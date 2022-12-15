@@ -58,7 +58,7 @@ class NotificationAction(
     }
 
     companion object {
-        const val NOTIFICATION_CHANNEL = "NotificationChannel"
+        private const val NOTIFICATION_CHANNEL = "NotificationChannel"
         const val SHOW_CONTACTS_ACTION = "ShowContactsAction"
     }
 }

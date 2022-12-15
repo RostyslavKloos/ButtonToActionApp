@@ -10,6 +10,7 @@ class ToastAction(
     private val context: Context,
     @StringRes private val messageId: Int = R.string.action_is_toast,
 ) : ActionUi {
-    override fun perform() =
+    override fun perform() {
         Toast.makeText(context, context.getText(messageId), Toast.LENGTH_SHORT).show()
+    }
 }

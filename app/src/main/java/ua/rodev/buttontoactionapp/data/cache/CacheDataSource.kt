@@ -2,11 +2,13 @@ package ua.rodev.buttontoactionapp.data.cache
 
 import android.content.Context
 import com.google.gson.Gson
-import okio.IOException
 import ua.rodev.buttontoactionapp.data.FetchActions
 import ua.rodev.buttontoactionapp.data.cloud.ActionCloud
 import ua.rodev.buttontoactionapp.data.cloud.CloudActionsList
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
 
 interface CacheDataSource : FetchActions {
 
@@ -24,23 +26,18 @@ interface CacheDataSource : FetchActions {
             val actionsJson = gson.toJson(actions)
             directory.mkdirs()
             val file = File(directory, CHILD)
-            if (!file.exists()) {
-                file.createNewFile()
-            }
-            BufferedWriter(FileWriter(file)).apply {
-                write(actionsJson)
-                close()
+            if (!file.exists()) file.createNewFile()
+            BufferedWriter(FileWriter(file)).use {
+                it.write(actionsJson)
             }
         }
 
-        @Throws(IOException::class)
         override suspend fun fetchActions(): List<ActionCloud> {
             val file = File(directory, CHILD)
-            FileReader(file).use { fileReader ->
-                BufferedReader(fileReader).use { bufferedReader ->
-                    return gson.fromJson(bufferedReader.readLine(), CloudActionsList::class.java)
-                }
-            }
+            return if (file.exists()) {
+                val json = file.inputStream().bufferedReader().use(BufferedReader::readText)
+                gson.fromJson(json, CloudActionsList::class.java)
+            } else emptyList()
         }
 
         companion object {
