@@ -13,18 +13,23 @@ import javax.inject.Singleton
 @Module
 object DomainModule {
 
+    @Provides
+    fun provideNow(): Now = Now.Main()
+
     @Singleton
     @Provides
     fun provideActionInteractor(
         repository: ActionRepository,
         handleError: HandleError<String>,
         usageHistory: ActionsUsageTimeHistoryStorage.Mutable,
-        networkMonitor: NetworkMonitor
+        networkMonitor: NetworkMonitor,
+        now: Now,
     ): ActionInteractor = ActionInteractor.Main(
         repository,
         handleError,
         MainCheckValidDays(),
         usageHistory,
-        networkMonitor
+        networkMonitor,
+        now
     )
 }

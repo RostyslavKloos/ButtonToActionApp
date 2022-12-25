@@ -3,7 +3,6 @@ package ua.rodev.buttontoactionapp.domain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTimeUtils
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -21,6 +20,7 @@ class ActionInteractorTest {
     private lateinit var usageHistory: FakeUsageHistory
     private lateinit var handleError: HandleError<String>
     private lateinit var networkMonitor: FakeNetworkMonitor
+    private lateinit var now: FakeNow
 
     @Before
     fun setUp() {
@@ -29,12 +29,14 @@ class ActionInteractorTest {
         handleError = HandleUiError(manageResources)
         usageHistory = FakeUsageHistory()
         networkMonitor = FakeNetworkMonitor()
+        now = FakeNow()
         interactor = ActionInteractor.Main(
             repository,
             handleError,
             MainCheckValidDays(),
             usageHistory,
-            networkMonitor
+            networkMonitor,
+            now
         )
     }
 
@@ -43,7 +45,7 @@ class ActionInteractorTest {
     fun `Fetch action no internet connection error`() = runBlocking {
         manageResources.changeExpected("No internet connection")
 
-        val actual = interactor.action(System.currentTimeMillis())
+        val actual = interactor.actionResult()
         val expected = ActionResult.Failure("No internet connection")
 
         assertEquals(actual, expected)
@@ -58,7 +60,7 @@ class ActionInteractorTest {
         repository.changeExpectedList(notEnabledActions)
         manageResources.changeExpected("No available actions")
 
-        val actual = interactor.action(System.currentTimeMillis())
+        val actual = interactor.actionResult()
         val expected = ActionResult.Failure("No available actions")
 
         assertEquals(actual, expected)
@@ -73,7 +75,7 @@ class ActionInteractorTest {
             repository.changeExpectedList(notEnabledActions)
             manageResources.changeExpected("No available actions")
 
-            val actual = interactor.action(System.currentTimeMillis())
+            val actual = interactor.actionResult()
             val expected = ActionResult.Failure("No available actions")
 
             assertEquals(actual, expected)
@@ -89,7 +91,7 @@ class ActionInteractorTest {
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("No available actions")
 
-        val actual = interactor.action(System.currentTimeMillis())
+        val actual = interactor.actionResult()
         val expected = ActionResult.Failure("No available actions")
 
         assertEquals(expected, actual)
@@ -97,15 +99,16 @@ class ActionInteractorTest {
 
     @Test
     fun `Fetch action coolDown period error`() = runBlocking {
+        now.addTime(0)
         val currentDay = LocalDate.now().dayOfWeek
         val action = ActionDomain(ActionType.Call, true, 1, listOf(currentDay.ordinal), 3_600)
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("no available actions")
 
-        interactor.action(DateTimeUtils.currentTimeMillis())
-        DateTimeUtils.setCurrentMillisFixed(System.currentTimeMillis() + 3_000)
+        interactor.actionResult()
+        now.addTime(3_000)
 
-        val actual = interactor.action(DateTimeUtils.currentTimeMillis())
+        val actual = interactor.actionResult()
         val expected = ActionResult.Failure("no available actions")
         assertEquals(expected, actual)
     }
@@ -119,12 +122,12 @@ class ActionInteractorTest {
         manageResources.changeExpected("No available actions")
         networkMonitor.changeConnection(false)
 
-        val firstCall = interactor.action(System.currentTimeMillis())
+        val firstCall = interactor.actionResult()
         assertEquals(ActionResult.Failure("No available actions"), firstCall)
 
         networkMonitor.changeConnection(true)
 
-        val secondCall = interactor.action(System.currentTimeMillis())
+        val secondCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), secondCall)
     }
 
@@ -136,12 +139,12 @@ class ActionInteractorTest {
         repository.changeExpectedList(listOf(toastAction, otherAction))
         networkMonitor.changeConnection(false)
 
-        val firstCall = interactor.action(System.currentTimeMillis())
+        val firstCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Notification), firstCall)
 
         networkMonitor.changeConnection(true)
 
-        val secondCall = interactor.action(System.currentTimeMillis())
+        val secondCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), secondCall)
     }
 
@@ -152,7 +155,7 @@ class ActionInteractorTest {
         val lowPriorityAction = ActionDomain(ActionType.Animation, true, 1, weekDays, 0)
         repository.changeExpectedList(listOf(highPriorityAction, lowPriorityAction))
 
-        val actual = interactor.action(System.currentTimeMillis())
+        val actual = interactor.actionResult()
         val expected = ActionResult.Success(ActionType.Call)
 
         assertEquals(expected, actual)
@@ -173,16 +176,16 @@ class ActionInteractorTest {
         repository.changeExpectedList(listOf(action))
         manageResources.changeExpected("no available actions")
 
-        val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        val firstCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
-        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
-        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        now.addTime(300)
+        val secondCall = interactor.actionResult()
         assertEquals(ActionResult.Failure("no available actions"), secondCall)
 
-        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
-        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        now.addTime(10_000)
+        val thirdCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), thirdCall)
 
         assertNotEquals(usageHistory.coolDownHistory.first(), usageHistory.coolDownHistory.last())
@@ -206,17 +209,17 @@ class ActionInteractorTest {
         repository.changeExpectedList(listOf(action1, action2))
         manageResources.changeExpected("no available actions")
 
-        val firstCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        val firstCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), firstCall)
         assertNotEquals(emptyMap<String, Long>(), usageHistory.read())
 
-        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 300)
-        val secondCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        now.addTime(300)
+        val secondCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Call), secondCall)
         assertEquals(2, usageHistory.read().count())
 
-        DateTimeUtils.setCurrentMillisFixed(DateTimeUtils.currentTimeMillis() + 10_000)
-        val thirdCall = interactor.action(DateTimeUtils.currentTimeMillis())
+        now.addTime(10_000)
+        val thirdCall = interactor.actionResult()
         assertEquals(ActionResult.Success(ActionType.Toast()), thirdCall)
         assertTrue(usageHistory.coolDownHistory.last() > usageHistory.coolDownHistory.first() + 7_200)
     }
@@ -281,5 +284,16 @@ class ActionInteractorTest {
         fun changeConnection(connected: Boolean) {
             isOnline = connected
         }
+    }
+
+    private class FakeNow: Now {
+
+        private var time: Long = 0
+
+        fun addTime(time: Long) {
+            this.time += time
+        }
+
+        override fun time(): Long = time
     }
 }

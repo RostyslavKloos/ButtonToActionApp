@@ -36,7 +36,7 @@ abstract class BaseActionViewModelTest {
             actionResult = source
         }
 
-        override suspend fun action(currentTimeMills: Long): ActionResult = actionResult
+        override suspend fun actionResult(): ActionResult = actionResult
     }
 
     protected class FakeActionTarget : Target.Mutable<ActionType> {

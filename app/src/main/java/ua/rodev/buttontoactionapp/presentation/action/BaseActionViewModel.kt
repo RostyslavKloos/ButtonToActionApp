@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.joda.time.DateTimeUtils
 import ua.rodev.buttontoactionapp.R
 import ua.rodev.buttontoactionapp.core.CoroutineDispatchers
 import ua.rodev.buttontoactionapp.domain.ActionInteractor
@@ -50,7 +49,7 @@ abstract class BaseActionViewModel(
         viewModelScope.launch {
             progressTarget.map(View.VISIBLE)
             withContext(dispatchers.io()) {
-                val action = interactor.action(DateTimeUtils.currentTimeMillis())
+                val action = interactor.actionResult()
                 action.map(mapper)
             }
             progressTarget.map(View.GONE)

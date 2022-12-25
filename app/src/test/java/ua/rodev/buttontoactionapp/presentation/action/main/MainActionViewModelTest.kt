@@ -50,7 +50,7 @@ class MainActionViewModelTest : BaseActionViewModelTest() {
         assertEquals(1, snackbarTarget.snankbarShown)
         assertEquals(
             ActionResult.Failure("no internet connection"),
-            interactor.action(System.currentTimeMillis())
+            interactor.actionResult()
         )
     }
 
@@ -66,7 +66,7 @@ class MainActionViewModelTest : BaseActionViewModelTest() {
         assertEquals(0, snackbarTarget.snankbarShown)
         assertEquals(
             ActionResult.Success(ActionType.Call),
-            interactor.action(System.currentTimeMillis())
+            interactor.actionResult()
         )
     }
 
@@ -82,7 +82,7 @@ class MainActionViewModelTest : BaseActionViewModelTest() {
         assertEquals(0, snackbarTarget.snankbarShown)
         assertEquals(
             ActionResult.Success(ActionType.Animation),
-            interactor.action(System.currentTimeMillis())
+            interactor.actionResult()
         )
 
         interactor.changeExpectedResult(ActionResult.Failure("no available actions"))
@@ -95,7 +95,7 @@ class MainActionViewModelTest : BaseActionViewModelTest() {
         assertEquals(1, snackbarTarget.snankbarShown)
         assertEquals(
             ActionResult.Failure("no available actions"),
-            interactor.action(System.currentTimeMillis())
+            interactor.actionResult()
         )
     }
 }

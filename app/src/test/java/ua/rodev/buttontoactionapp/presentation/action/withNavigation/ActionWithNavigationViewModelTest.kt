@@ -57,7 +57,7 @@ class ActionWithNavigationViewModelTest : BaseActionViewModelTest() {
         assertEquals(View.GONE, progressTarget.progressCalledList[1])
         assertEquals(
             ActionResult.Success(ActionType.Call),
-            interactor.action(System.currentTimeMillis())
+            interactor.actionResult()
         )
         assertEquals(NavigationStrategy.Add(Screen.Contacts), navigationTarget.strategy)
         assertEquals(1, navigationTarget.count)
